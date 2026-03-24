@@ -1,0 +1,127 @@
+# ─────────────────────────────────────────────────────────────────
+# Decap CMS configuration — Sabareesh Portfolio
+# Docs: https://decapcms.org/docs/configuration-options/
+# ─────────────────────────────────────────────────────────────────
+
+backend:
+  name: git-gateway          # Uses Netlify Identity + Git Gateway
+  branch: main               # Branch to update on publish
+
+# Where uploaded media files are stored in the repo
+media_folder: public/images/uploads
+# Public URL path for those files in the browser
+public_folder: /images/uploads
+
+# Show a live preview pane inside the editor
+show_preview_links: true
+
+collections:
+
+  # ── BLOG POSTS ───────────────────────────────────────────────
+  - name: "blog"
+    label: "Blog Posts"
+    folder: "content/blog"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    preview_path: "blog/{{slug}}"
+    fields:
+      - { label: "Title",          name: "title",         widget: "string" }
+      - { label: "Publish Date",   name: "date",          widget: "datetime" }
+      - { label: "Tags",           name: "tags",          widget: "list",   allow_add: true }
+      - { label: "Featured Image", name: "featuredImage", widget: "image",  required: false }
+      - { label: "Excerpt",        name: "excerpt",       widget: "text",   required: false }
+      - { label: "Body",           name: "body",          widget: "markdown" }
+
+  # ── PAGE CONTENT (file-based collections) ────────────────────
+  - name: "pages"
+    label: "Pages"
+    files:
+
+      # Writer Page
+      - name: "writer"
+        label: "Writer Page"
+        file: "content/pages/writer.md"
+        fields:
+          - { label: "Page Title", name: "title",  widget: "string" }
+          - { label: "Intro",      name: "intro",  widget: "text" }
+          - name: "books"
+            label: "Books"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "Book Title",    name: "title",        widget: "string" }
+              - { label: "Description",   name: "description",  widget: "text" }
+              - { label: "Amazon Link",   name: "amazonLink",   widget: "string" }
+              - { label: "Flipkart Link", name: "flipkartLink", widget: "string" }
+              - { label: "Cover Image",   name: "coverImage",   widget: "image",  required: false }
+
+      # SAP Page
+      - name: "sap"
+        label: "SAP Page"
+        file: "content/pages/sap.md"
+        fields:
+          - { label: "Page Title",   name: "title",    widget: "string" }
+          - { label: "Approach",     name: "approach", widget: "markdown" }
+          - name: "certifications"
+            label: "Certifications"
+            widget: "list"
+            summary: "{{fields.name}}"
+            fields:
+              - { label: "Certification Name", name: "name",   widget: "string" }
+              - { label: "Issuer",             name: "issuer", widget: "string" }
+              - { label: "Year",               name: "year",   widget: "string" }
+          - name: "communityLinks"
+            label: "Community Blog Links"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "URL",   name: "url",   widget: "string" }
+              - { label: "Date",  name: "date",  widget: "string", required: false }
+
+      # Growth Page
+      - name: "growth"
+        label: "Growth Page"
+        file: "content/pages/growth.md"
+        fields:
+          - { label: "Page Title", name: "title", widget: "string" }
+          - { label: "Intro",      name: "intro",  widget: "text" }
+          - name: "experience"
+            label: "Experience Items"
+            widget: "list"
+            summary: "{{fields.role}} @ {{fields.company}}"
+            fields:
+              - { label: "Role",        name: "role",        widget: "string" }
+              - { label: "Company",     name: "company",     widget: "string" }
+              - { label: "Duration",    name: "duration",    widget: "string" }
+              - { label: "Description", name: "description", widget: "text" }
+          - name: "skills"
+            label: "Skills"
+            widget: "list"
+            field: { label: "Skill", name: "skill", widget: "string" }
+
+      # Agentic AI Page
+      - name: "agentic-ai"
+        label: "Agentic AI Page"
+        file: "content/pages/agentic-ai.md"
+        fields:
+          - { label: "Page Title", name: "title", widget: "string" }
+          - { label: "Intro",      name: "intro",  widget: "text" }
+          - name: "expertise"
+            label: "Expertise Items"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "Title",       name: "title",       widget: "string" }
+              - { label: "Description", name: "description", widget: "text" }
+          - name: "projects"
+            label: "Projects"
+            widget: "list"
+            summary: "{{fields.name}}"
+            fields:
+              - { label: "Name",        name: "name",        widget: "string" }
+              - { label: "Description", name: "description", widget: "text" }
+              - label: "Status"
+                name: "status"
+                widget: "select"
+                options: ["Live", "In Progress", "Concept"]
