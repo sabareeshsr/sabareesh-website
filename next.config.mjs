@@ -1,4 +1,11 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {};
+import { withPayload } from '@payloadcms/next/withPayload'
 
-export default nextConfig;
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Allow serving uploaded media from /public/media
+  images: {
+    remotePatterns: [],
+  },
+}
+
+export default withPayload(nextConfig)

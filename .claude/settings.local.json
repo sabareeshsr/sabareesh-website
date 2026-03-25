@@ -3,7 +3,16 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(py:*)",
-      "mcp__figma-remote-mcp__get_design_context"
+      "mcp__figma-remote-mcp__get_design_context",
+      "Bash(mkdir -p \"E:\\\\11. Sabareesh Website\\\\Sabareesh Website Code\\\\app\\\\\\(payload\\)\\\\admin\\\\[[...segments]]\")",
+      "Bash(mkdir -p \"E:\\\\11. Sabareesh Website\\\\Sabareesh Website Code\\\\app\\\\\\(payload\\)\\\\api\\\\[...slug]\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/admin)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/admin/create-first-user)",
+      "Bash(mv page.tsx \"\\(site\\)/page.tsx\")",
+      "Bash(mv agentic-ai/page.tsx \"\\(site\\)/agentic-ai/page.tsx\")",
+      "Bash(mv blog/page.tsx \"\\(site\\)/blog/page.tsx\")",
+      "Bash(mv \"blog/[slug]/page.tsx\" \"\\(site\\)/blog/[slug]/page.tsx\")",
+      "Bash(mv contact/page.tsx \"\\(site\\)/contact/page.tsx\")"
     ]
   }
 }
