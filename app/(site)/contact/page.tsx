@@ -2,11 +2,6 @@ import type { Metadata } from 'next'
 import ContactForm from './ContactForm'
 import { getPage } from '@/lib/getPage'
 
-export const metadata: Metadata = {
-  title: 'Contact | Sabareesh',
-  description: 'Get in touch with Sabareesh — for SAP AI projects, growth marketing, writing collaborations, or anything else.',
-}
-
 interface ContactPageDoc {
   heroTitle?: string
   heroSubtitle?: string
@@ -17,6 +12,22 @@ interface ContactPageDoc {
   availability?: string
   formTitle?: string
   subjectOptions?: Array<{ subject: string }>
+  seo?: { seoTitle?: string; seoDescription?: string; ogImage?: { url?: string } | null }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPage<ContactPageDoc>('contact')
+  const title = page?.seo?.seoTitle || 'Contact | Sabareesh'
+  const description = page?.seo?.seoDescription || 'Get in touch with Sabareesh — for SAP AI projects, growth marketing, writing collaborations, or anything else.'
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: page?.seo?.ogImage?.url ? [{ url: page.seo.ogImage.url }] : [],
+    },
+  }
 }
 
 const GLASS = 'backdrop-blur-[16px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-[24px]'

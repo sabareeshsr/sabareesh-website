@@ -35,14 +35,25 @@ async function seed() {
   ══════════════════════════════════════════ */
   await upsertPage({
     pageType: 'home',
+    heroTitle: 'Sabareesh',
     heroGreeting: "Hi, It's Me",
     heroName: 'Sabareesh',
     heroBio: 'SAP Gen AI Developer · Growth Marketer · Author · Agentic AI Builder',
+    typewriterWords: [
+      { word: 'Writer' },
+      { word: 'SAP GenAI Developer' },
+      { word: 'Growth Marketer' },
+      { word: 'AI Agent Manager' },
+    ],
     skillTiles: [
       { label: 'Writer',      icon: 'book',    link: '/writer' },
-      { label: 'SAP Gen AI',  icon: 'sap',     link: '/sap' },
+      { label: 'SAP Gen AI',  icon: 'circuit', link: '/sap' },
       { label: 'Growth',      icon: 'chart',   link: '/growth' },
       { label: 'Agentic AI',  icon: 'robot',   link: '/agentic-ai' },
+    ],
+    ctaButtons: [
+      { label: 'View My Work', url: '#about',   style: 'primary' },
+      { label: 'Get in Touch', url: '/contact', style: 'ghost' },
     ],
     aboutTitle: 'About Me',
     achievements: [
@@ -57,6 +68,10 @@ async function seed() {
       { value: '4×',   label: 'LinkedIn Growth' },
       { value: '1',    label: 'Novel Published' },
     ],
+    seo: {
+      seoTitle: 'Sabareesh — Writer, SAP GenAI Dev & AI Builder',
+      seoDescription: 'SAP Gen AI Developer, Growth Marketer, Published Author, and Agentic AI Builder.',
+    },
   })
 
   /* ══════════════════════════════════════════
@@ -69,6 +84,17 @@ async function seed() {
     bookTitle: 'Five Days Forever',
     amazonLink: '#',
     flipkartLink: '#',
+    books: [
+      {
+        bookTitle: 'Five Days Forever',
+        amazonLink: '#',
+        flipkartLink: '#',
+      },
+    ],
+    seo: {
+      seoTitle: 'Writer | Sabareesh',
+      seoDescription: 'Stories that move people. Books that shape minds.',
+    },
   })
 
   /* ══════════════════════════════════════════
@@ -100,6 +126,10 @@ async function seed() {
       { icon: '⚡', title: 'Rapid Prototyping', description: 'Business requirement to working prototype in days using SAP AI Core, Joule, and custom agent pipelines.' },
       { icon: '🔒', title: 'Enterprise Security', description: 'Data stays within enterprise boundaries. Auth, RBAC, and audit logging built in from day one.' },
     ],
+    seo: {
+      seoTitle: 'SAP Gen AI Developer | Sabareesh',
+      seoDescription: 'Bridging enterprise SAP ecosystems with the power of generative AI and intelligent automation.',
+    },
   })
 
   /* ══════════════════════════════════════════
@@ -136,6 +166,10 @@ async function seed() {
       { metric: '20+', label: 'Enterprise Clients' },
       { metric: '4×',  label: 'LinkedIn Growth' },
     ],
+    seo: {
+      seoTitle: 'Growth Marketer | Sabareesh',
+      seoDescription: 'Driving measurable growth through content, campaigns, and creativity — from zero to enterprise scale.',
+    },
   })
 
   /* ══════════════════════════════════════════
@@ -163,6 +197,10 @@ async function seed() {
       { tool: 'SAP AI Core' }, { tool: 'Cursor' }, { tool: 'n8n' },
       { tool: 'Zapier' }, { tool: 'Vercel AI SDK' }, { tool: 'Python' }, { tool: 'TypeScript' },
     ],
+    seo: {
+      seoTitle: 'Agentic AI | Sabareesh',
+      seoDescription: 'Building autonomous AI systems that think, plan, and act — turning complex workflows into self-driving pipelines.',
+    },
   })
 
   /* ══════════════════════════════════════════
@@ -172,6 +210,10 @@ async function seed() {
     pageType: 'blog',
     heroTitle: 'Blogs',
     heroSubtitle: 'Thoughts on SAP, generative AI, growth marketing, creative writing, and the future of work.',
+    seo: {
+      seoTitle: 'Blog | Sabareesh',
+      seoDescription: 'Articles on SAP, Gen AI, growth marketing, writing, and agentic systems.',
+    },
   })
 
   /* ══════════════════════════════════════════
@@ -194,6 +236,10 @@ async function seed() {
       { subject: 'Speaking / Podcast' },
       { subject: 'General Enquiry' },
     ],
+    seo: {
+      seoTitle: 'Contact | Sabareesh',
+      seoDescription: 'Get in touch with Sabareesh — for SAP AI projects, growth marketing, writing collaborations, or anything else.',
+    },
   })
 
   /* ══════════════════════════════════════════

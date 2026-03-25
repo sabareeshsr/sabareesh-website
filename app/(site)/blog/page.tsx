@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { getPage } from '@/lib/getPage'
@@ -13,6 +14,7 @@ interface BlogPageDoc {
   heroTitle?: string
   heroSubtitle?: string
   featuredPost?: Post | string | null
+  seo?: { seoTitle?: string; seoDescription?: string; ogImage?: { url?: string } | null }
 }
 
 async function getPosts(): Promise<Post[]> {
@@ -29,9 +31,19 @@ async function getPosts(): Promise<Post[]> {
   } catch { return [] }
 }
 
-export const metadata = {
-  title: 'Blog | Sabareesh',
-  description: 'Articles on SAP, Gen AI, growth marketing, writing, and agentic systems.',
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPage<BlogPageDoc>('blog')
+  const title = page?.seo?.seoTitle || 'Blog | Sabareesh'
+  const description = page?.seo?.seoDescription || 'Articles on SAP, Gen AI, growth marketing, writing, and agentic systems.'
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: page?.seo?.ogImage?.url ? [{ url: page.seo.ogImage.url }] : [],
+    },
+  }
 }
 
 export default async function BlogPage() {

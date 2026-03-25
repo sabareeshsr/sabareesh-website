@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getPage } from '@/lib/getPage'
 
@@ -15,6 +16,22 @@ interface AgenticAIPage {
   aiProjects?: AIProject[]
   services?: Array<{ title?: string; description?: string }>
   toolStack?: ToolItem[]
+  seo?: { seoTitle?: string; seoDescription?: string; ogImage?: { url?: string } | null }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPage<AgenticAIPage>('agentic-ai')
+  const title = page?.seo?.seoTitle || 'Agentic AI | Sabareesh'
+  const description = page?.seo?.seoDescription || 'Building autonomous AI systems that think, plan, and act — turning complex workflows into self-driving pipelines.'
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: page?.seo?.ogImage?.url ? [{ url: page.seo.ogImage.url }] : [],
+    },
+  }
 }
 
 /* ─── Fallback content ─── */

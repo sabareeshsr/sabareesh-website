@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getPage } from '@/lib/getPage'
 
@@ -14,6 +15,22 @@ interface GrowthPage {
   experiences?: Experience[]
   skills?: Skill[]
   growthStats?: GrowthStat[]
+  seo?: { seoTitle?: string; seoDescription?: string; ogImage?: { url?: string } | null }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPage<GrowthPage>('growth')
+  const title = page?.seo?.seoTitle || 'Growth Marketer | Sabareesh'
+  const description = page?.seo?.seoDescription || 'Driving measurable growth through content, campaigns, and creativity — from zero to enterprise scale.'
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: page?.seo?.ogImage?.url ? [{ url: page.seo.ogImage.url }] : [],
+    },
+  }
 }
 
 /* ─── Fallback content ─── */

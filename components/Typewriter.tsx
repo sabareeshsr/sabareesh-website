@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const ROLES = [
+const DEFAULT_WORDS = [
   "Writer",
   "SAP GenAI Developer",
   "Growth Marketer",
@@ -14,7 +14,9 @@ const DELETE_SPEED = 45;   // ms per character deleted
 const PAUSE_AFTER  = 2000; // ms pause when word is fully typed
 const PAUSE_BEFORE = 300;  // ms pause before typing next word
 
-export default function Typewriter() {
+export default function Typewriter({ words }: { words?: string[] }) {
+  const ROLES = words?.length ? words : DEFAULT_WORDS;
+
   const [displayed, setDisplayed]   = useState("");
   const [roleIdx,   setRoleIdx]     = useState(0);
   const [phase, setPhase] = useState<"typing" | "pausing" | "deleting" | "waiting">("typing");
@@ -31,7 +33,6 @@ export default function Typewriter() {
           const t = setTimeout(() => setDisplayed(role.slice(0, displayed.length + 1)), delay);
           return () => clearTimeout(t);
         } else {
-          // word complete → pause
           delay = PAUSE_AFTER;
           const t = setTimeout(() => setPhase("deleting"), delay);
           return () => clearTimeout(t);
@@ -43,7 +44,6 @@ export default function Typewriter() {
           const t = setTimeout(() => setDisplayed(displayed.slice(0, -1)), delay);
           return () => clearTimeout(t);
         } else {
-          // fully deleted → wait before next word
           delay = PAUSE_BEFORE;
           const t = setTimeout(() => {
             setRoleIdx((prev) => (prev + 1) % ROLES.length);
@@ -52,7 +52,7 @@ export default function Typewriter() {
           return () => clearTimeout(t);
         }
     }
-  }, [displayed, roleIdx, phase]);
+  }, [displayed, roleIdx, phase, ROLES]);
 
   return (
     <span className="font-plus-jakarta font-bold text-[28px] md:text-[34px] tracking-tight">

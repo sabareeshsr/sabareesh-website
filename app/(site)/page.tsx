@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import Typewriter from '@/components/Typewriter'
@@ -26,6 +27,11 @@ const FB = {
     { label: 'Growth Marketer',  icon: 'chart',   link: '/growth' },
     { label: 'AI Agent Manager', icon: 'robot',   link: '/agentic-ai' },
   ],
+  ctaButtons: [
+    { label: 'View My Work', url: '#about', style: 'primary' },
+    { label: 'Get in Touch', url: '/contact', style: 'ghost' },
+  ],
+  typewriterWords: ['Writer', 'SAP GenAI Developer', 'Growth Marketer', 'AI Agent Manager'],
   socials: { linkedin: 'https://linkedin.com/in/sabareesh', twitter: 'https://twitter.com/sabareesh', github: 'https://github.com/sabareesh' },
 }
 
@@ -33,7 +39,7 @@ const FB = {
 const TILE_BASE = 'backdrop-blur-[8px] bg-[rgba(26,31,47,0.6)] border border-[rgba(222,225,247,0.2)] rounded-[24px] flex flex-col items-center justify-center gap-[6px] w-[160px] h-[80px]'
 const TILE_LABEL = 'font-inter font-medium text-[10px] text-[#c0c7d1] tracking-[0.3px] uppercase text-center leading-tight px-2'
 
-/* ─── Inline icons (same as before) ─── */
+/* ─── Inline icons ─── */
 function BookIcon()    { return <svg width="18" height="20" viewBox="0 0 18 22" fill="none"><path d="M1 3C1 1.9 1.9 1 3 1H15C16.1 1 17 1.9 17 3V19C17 20.1 16.1 21 15 21H3C1.9 21 1 20.1 1 19V3Z" stroke="#94ccff" strokeWidth="1.5"/><path d="M5 7H13M5 11H11" stroke="#94ccff" strokeWidth="1.5" strokeLinecap="round"/></svg> }
 function CircuitIcon() { return <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><rect x="7" y="7" width="8" height="8" rx="1" stroke="#94ccff" strokeWidth="1.5"/><path d="M11 1V7M11 15V21M1 11H7M15 11H21M4 4L7 7M15 15L18 18M4 18L7 15M15 7L18 4" stroke="#94ccff" strokeWidth="1.5" strokeLinecap="round"/></svg> }
 function ChartIcon()   { return <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M1 21H21" stroke="#94ccff" strokeWidth="1.5" strokeLinecap="round"/><path d="M5 21V13M9 21V8M13 21V11M17 21V5" stroke="#94ccff" strokeWidth="1.5" strokeLinecap="round"/></svg> }
@@ -59,14 +65,39 @@ function ProfilePhoto({ size, src }: { size: number; src?: string | null }) {
   )
 }
 
+interface SeoData { seoTitle?: string; seoDescription?: string; ogImage?: { url?: string } | null }
+
 interface HomePageData {
+  heroTitle?: string
   heroGreeting?: string
   heroName?: string
   heroBio?: string
+  typewriterWords?: Array<{ word: string }>
   skillTiles?: Array<{ label: string; icon: string; link: string }>
+  ctaButtons?: Array<{ label: string; url: string; style: string }>
+  homeSocialLinks?: { linkedin?: string; twitter?: string; github?: string; email?: string }
   aboutTitle?: string
   achievements?: Array<{ label: string; icon?: string }>
   stats?: Array<{ value: string; label: string }>
+  seo?: SeoData
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const [page, settings] = await Promise.all([
+    getPage<HomePageData>('home'),
+    getSiteSettings(),
+  ])
+  const title = page?.seo?.seoTitle || 'Sabareesh — Writer, SAP GenAI Dev & AI Builder'
+  const description = page?.seo?.seoDescription || settings?.seoDescription || 'SAP Gen AI Developer, Growth Marketer, Published Author, and Agentic AI Builder.'
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: page?.seo?.ogImage?.url ? [{ url: page.seo.ogImage.url }] : [],
+    },
+  }
 }
 
 export default async function Home() {
@@ -83,10 +114,17 @@ export default async function Home() {
   const achievements = page?.achievements?.length ? page.achievements.map((a) => a.label) : FB.achievements
   const stats       = page?.stats?.length ? page.stats : FB.stats
   const profileImageUrl = (settings?.profileImage as any)?.url || null
-  const socials     = {
-    linkedin: settings?.socialLinks?.linkedin || FB.socials.linkedin,
-    twitter:  settings?.socialLinks?.twitter  || FB.socials.twitter,
-    github:   settings?.socialLinks?.github   || FB.socials.github,
+
+  const typewriterWords = page?.typewriterWords?.length
+    ? page.typewriterWords.map((t) => t.word).filter(Boolean)
+    : undefined
+
+  const ctaButtons = page?.ctaButtons?.length ? page.ctaButtons : FB.ctaButtons
+
+  const socials = {
+    linkedin: page?.homeSocialLinks?.linkedin || settings?.socialLinks?.linkedin || FB.socials.linkedin,
+    twitter:  page?.homeSocialLinks?.twitter  || settings?.socialLinks?.twitter  || FB.socials.twitter,
+    github:   page?.homeSocialLinks?.github   || settings?.socialLinks?.github   || FB.socials.github,
   }
 
   return (
@@ -104,11 +142,16 @@ export default async function Home() {
             <h1 className="font-plus-jakarta font-extrabold text-[56px] md:text-[68px] lg:text-[76px] leading-none tracking-[-2px]">
               <span className="bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' }}>{name}</span>
             </h1>
-            <div className="h-[44px] flex items-center"><Typewriter /></div>
+            <div className="h-[44px] flex items-center"><Typewriter words={typewriterWords} /></div>
             <p className="font-inter text-[17px] text-[#94a3b8] leading-[1.75] max-w-[480px]">{bio}</p>
             <div className="flex flex-wrap items-center gap-4 mt-2">
-              <a href="#about" className="font-plus-jakarta font-bold text-[15px] text-[#020617] px-7 py-3 rounded-[10px] transition-opacity hover:opacity-90 shadow-[0px_8px_24px_rgba(96,165,250,0.3)]" style={{ background: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' }}>View My Work</a>
-              <Link href="/contact" className="font-plus-jakarta font-bold text-[15px] text-[#60a5fa] px-7 py-3 rounded-[10px] border border-[rgba(96,165,250,0.35)] hover:border-[#60a5fa] hover:bg-[rgba(96,165,250,0.06)] transition-all">Get in Touch</Link>
+              {ctaButtons.map((btn) =>
+                btn.style === 'primary' ? (
+                  <a key={btn.label} href={btn.url} className="font-plus-jakarta font-bold text-[15px] text-[#020617] px-7 py-3 rounded-[10px] transition-opacity hover:opacity-90 shadow-[0px_8px_24px_rgba(96,165,250,0.3)]" style={{ background: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' }}>{btn.label}</a>
+                ) : (
+                  <Link key={btn.label} href={btn.url} className="font-plus-jakarta font-bold text-[15px] text-[#60a5fa] px-7 py-3 rounded-[10px] border border-[rgba(96,165,250,0.35)] hover:border-[#60a5fa] hover:bg-[rgba(96,165,250,0.06)] transition-all">{btn.label}</Link>
+                )
+              )}
             </div>
             <div className="flex items-center gap-4 mt-2">
               {[

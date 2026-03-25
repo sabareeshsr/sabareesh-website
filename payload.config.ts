@@ -22,13 +22,18 @@ export default buildConfig({
     {
       slug: 'users',
       auth: true,
-      admin: { useAsTitle: 'email' },
+      admin: { group: 'Admin', useAsTitle: 'email' },
       fields: [],
     },
 
     /* ─── Media ─── */
     {
       slug: 'media',
+      admin: {
+        group: 'Content',
+        defaultColumns: ['filename', 'mimeType', 'filesize'],
+        description: 'Images and files uploaded for use across the site.',
+      },
       upload: { staticDir: path.resolve(dirname, 'public/media') },
       fields: [{ name: 'alt', type: 'text', label: 'Alt text' }],
     },
@@ -37,8 +42,15 @@ export default buildConfig({
     {
       slug: 'blog-posts',
       admin: {
+        group: 'Content',
         useAsTitle: 'title',
-        defaultColumns: ['title', 'status', 'publishedDate'],
+        defaultColumns: ['title', 'status', 'publishedDate', 'tags'],
+        description: 'Blog posts shown on /blog. Set status to Published to make them live.',
+        preview: (doc: Record<string, unknown>) => {
+          const slug = doc?.slug as string
+          if (!slug) return null
+          return `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/blog/${slug}`
+        },
       },
       fields: [
         { name: 'title', type: 'text', required: true },
@@ -49,7 +61,7 @@ export default buildConfig({
           index: true,
           admin: {
             position: 'sidebar',
-            description: 'Auto-generated from title if left blank.',
+            description: 'Auto-generated from title if left blank. Edit to customise the URL.',
           },
           hooks: {
             beforeValidate: [
@@ -70,20 +82,31 @@ export default buildConfig({
           name: 'status',
           type: 'select',
           options: [
-            { label: 'Draft', value: 'draft' },
-            { label: 'Published', value: 'published' },
+            { label: '📝 Draft', value: 'draft' },
+            { label: '✅ Published', value: 'published' },
           ],
           defaultValue: 'draft',
-          admin: { position: 'sidebar' },
+          required: true,
+          admin: { position: 'sidebar', description: 'Switch to Published to make this post visible.' },
         },
         {
           name: 'publishedDate',
           type: 'date',
           admin: { position: 'sidebar', date: { pickerAppearance: 'dayOnly' } },
         },
-        { name: 'tags', type: 'array', fields: [{ name: 'tag', type: 'text' }] },
+        {
+          name: 'readTime',
+          type: 'number',
+          label: 'Read Time (min)',
+          admin: {
+            position: 'sidebar',
+            description: 'Estimated read time. Leave blank to auto-estimate from excerpt.',
+          },
+        },
+        { name: 'tags', type: 'array', fields: [{ name: 'tag', type: 'text' }], admin: { description: 'Tags used for filtering on the blog page.' } },
         { name: 'featuredImage', type: 'upload', relationTo: 'media' },
-        { name: 'excerpt', type: 'textarea' },
+        { name: 'excerpt', type: 'textarea', admin: { description: 'Short summary shown on the blog listing card.' } },
+        { name: 'metaDescription', type: 'textarea', label: 'Meta Description (SEO)', admin: { description: 'Used for search engine results. Falls back to Excerpt if blank.' } },
         { name: 'content', type: 'richText', editor: lexicalEditor({}) },
       ],
     },
@@ -92,8 +115,9 @@ export default buildConfig({
     {
       slug: 'pages',
       admin: {
+        group: 'Content',
         useAsTitle: 'pageType',
-        defaultColumns: ['pageType', 'heroTitle'],
+        defaultColumns: ['pageType', 'heroTitle', 'updatedAt'],
         description: 'One document per page. Use Page Type to select which page you are editing.',
       },
       fields: [
@@ -116,19 +140,19 @@ export default buildConfig({
         },
 
         /* ═══════════════════════════════════════════
-           SHARED — visible for most page types
+           SHARED — visible for all page types
         ═══════════════════════════════════════════ */
         {
           name: 'heroTitle',
           type: 'text',
           label: 'Hero Title',
-          admin: { condition: when('writer', 'sap', 'growth', 'agentic-ai', 'blog', 'contact') },
+          admin: { condition: when('home', 'writer', 'sap', 'growth', 'agentic-ai', 'blog', 'contact') },
         },
         {
           name: 'heroSubtitle',
           type: 'text',
           label: 'Hero Subtitle',
-          admin: { condition: when('writer', 'sap', 'growth', 'agentic-ai', 'blog', 'contact') },
+          admin: { condition: when('home', 'writer', 'sap', 'growth', 'agentic-ai', 'blog', 'contact') },
         },
 
         /* ═══════════════════════════════════════════
@@ -160,6 +184,16 @@ export default buildConfig({
           admin: { condition: when('home') },
         },
         {
+          name: 'typewriterWords',
+          type: 'array',
+          label: 'Typewriter Words (rotating roles)',
+          admin: {
+            condition: when('home'),
+            description: 'Each entry cycles through the typewriter animation in the hero.',
+          },
+          fields: [{ name: 'word', type: 'text', label: 'Word / Role (e.g. "Writer")' }],
+        },
+        {
           name: 'skillTiles',
           type: 'array',
           label: 'Skill Tiles (floating cards)',
@@ -168,6 +202,38 @@ export default buildConfig({
             { name: 'label', type: 'text', label: 'Label (e.g. "Writer")' },
             { name: 'icon',  type: 'text', label: 'Icon (emoji or SVG name)' },
             { name: 'link',  type: 'text', label: 'Link URL (e.g. /writer)' },
+          ],
+        },
+        {
+          name: 'ctaButtons',
+          type: 'array',
+          label: 'Hero CTA Buttons',
+          admin: {
+            condition: when('home'),
+            description: 'Buttons shown in the hero. Primary = solid blue, Ghost = outlined.',
+          },
+          fields: [
+            { name: 'label', type: 'text' },
+            { name: 'url',   type: 'text', label: 'URL (e.g. /contact or #about)' },
+            { name: 'style', type: 'select', options: [
+              { label: 'Primary (solid)', value: 'primary' },
+              { label: 'Ghost (outlined)', value: 'ghost' },
+            ]},
+          ],
+        },
+        {
+          name: 'homeSocialLinks',
+          type: 'group',
+          label: 'Hero Social Links',
+          admin: {
+            condition: when('home'),
+            description: 'Overrides Site Settings social links on the home hero. Leave blank to use Site Settings.',
+          },
+          fields: [
+            { name: 'linkedin', type: 'text', label: 'LinkedIn URL' },
+            { name: 'twitter',  type: 'text', label: 'Twitter / X URL' },
+            { name: 'github',   type: 'text', label: 'GitHub URL' },
+            { name: 'email',    type: 'text', label: 'Email Address' },
           ],
         },
         {
@@ -210,13 +276,13 @@ export default buildConfig({
         {
           name: 'bookTitle',
           type: 'text',
-          label: 'Book Title',
+          label: 'Book Title (single-book, legacy)',
           admin: { condition: when('writer') },
         },
         {
           name: 'bookDescription',
           type: 'richText',
-          label: 'Book Description',
+          label: 'Book Description (single-book, legacy)',
           editor: lexicalEditor({}),
           admin: { condition: when('writer') },
         },
@@ -224,35 +290,63 @@ export default buildConfig({
           name: 'bookCover',
           type: 'upload',
           relationTo: 'media',
-          label: 'Book Cover Image',
+          label: 'Book Cover Image (single-book, legacy)',
           admin: { condition: when('writer') },
         },
         {
           name: 'amazonLink',
           type: 'text',
-          label: 'Amazon Buy Link',
+          label: 'Amazon Buy Link (single-book, legacy)',
           admin: { condition: when('writer') },
         },
         {
           name: 'flipkartLink',
           type: 'text',
-          label: 'Flipkart Buy Link',
+          label: 'Flipkart Buy Link (single-book, legacy)',
           admin: { condition: when('writer') },
         },
         {
           name: 'otherStoreLink',
           type: 'text',
-          label: 'Other Store Link',
+          label: 'Other Store Link (single-book, legacy)',
           admin: { condition: when('writer') },
         },
         {
           name: 'writerSections',
           type: 'array',
-          label: 'Content Sections (About the Book, etc.)',
+          label: 'Content Sections (legacy — use Additional Sections below)',
           admin: { condition: when('writer') },
           fields: [
             { name: 'title',   type: 'text' },
             { name: 'content', type: 'richText', editor: lexicalEditor({}) },
+          ],
+        },
+        {
+          name: 'books',
+          type: 'array',
+          label: 'Books',
+          admin: {
+            condition: when('writer'),
+            description: 'Add one entry per book. Each renders as its own showcase section.',
+          },
+          fields: [
+            { name: 'bookTitle',       type: 'text',     label: 'Book Title' },
+            { name: 'bookDescription', type: 'richText', label: 'Book Description', editor: lexicalEditor({}) },
+            { name: 'bookCover',       type: 'upload',   relationTo: 'media', label: 'Book Cover Image' },
+            { name: 'amazonLink',      type: 'text',     label: 'Amazon Buy Link' },
+            { name: 'flipkartLink',    type: 'text',     label: 'Flipkart Buy Link' },
+            { name: 'otherStoreLink',  type: 'text',     label: 'Other Store Link' },
+            { name: 'aboutTheBook',    type: 'richText', label: 'About the Book', editor: lexicalEditor({}) },
+          ],
+        },
+        {
+          name: 'additionalSections',
+          type: 'array',
+          label: 'Additional Sections',
+          admin: { condition: when('writer') },
+          fields: [
+            { name: 'sectionTitle',   type: 'text',     label: 'Section Title' },
+            { name: 'sectionContent', type: 'richText', label: 'Section Content', editor: lexicalEditor({}) },
           ],
         },
 
@@ -463,32 +557,33 @@ export default buildConfig({
         },
 
         /* ═══════════════════════════════════════════
-           LEGACY — kept for backward compat
+           SEO — all page types
+        ═══════════════════════════════════════════ */
+        {
+          name: 'seo',
+          type: 'group',
+          label: 'SEO',
+          admin: { condition: when('home', 'writer', 'sap', 'growth', 'agentic-ai', 'blog', 'contact') },
+          fields: [
+            { name: 'seoTitle',       type: 'text',     label: 'SEO Title' },
+            { name: 'seoDescription', type: 'textarea', label: 'SEO Description' },
+            { name: 'ogImage',        type: 'upload',   relationTo: 'media', label: 'Open Graph Image' },
+          ],
+        },
+
+        /* ═══════════════════════════════════════════
+           LEGACY — hidden fields kept for compat
         ═══════════════════════════════════════════ */
         {
           name: 'sections',
           type: 'array',
           label: 'Generic Sections (legacy)',
-          admin: { condition: () => false }, // hidden — use page-specific fields
+          admin: { condition: () => false },
           fields: [
             { name: 'title',       type: 'text' },
             { name: 'description', type: 'textarea' },
             { name: 'icon',        type: 'text' },
             { name: 'link',        type: 'text' },
-          ],
-        },
-        {
-          name: 'ctaButtons',
-          type: 'array',
-          label: 'CTA Buttons (legacy)',
-          admin: { condition: () => false },
-          fields: [
-            { name: 'label', type: 'text' },
-            { name: 'url',   type: 'text' },
-            { name: 'style', type: 'select', options: [
-              { label: 'Primary', value: 'primary' },
-              { label: 'Ghost',   value: 'ghost' },
-            ]},
           ],
         },
       ],
@@ -547,7 +642,7 @@ export default buildConfig({
         },
 
         /* ── Legacy fields kept for compatibility ── */
-        { name: 'name',     type: 'text',     label: 'Name (legacy — use Site Name above)', admin: { condition: () => false } },
+        { name: 'name',     type: 'text',     label: 'Name (legacy)', admin: { condition: () => false } },
         { name: 'bio',      type: 'textarea', admin: { condition: () => false } },
         { name: 'aboutText', type: 'richText', editor: lexicalEditor({}), admin: { condition: () => false } },
         { name: 'achievements', type: 'array', admin: { condition: () => false }, fields: [

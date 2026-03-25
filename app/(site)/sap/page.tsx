@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import RichText from '@/components/RichText'
 import { getPage } from '@/lib/getPage'
@@ -20,6 +21,22 @@ interface SAPPage {
   approachTitle?: string
   approachContent?: object
   sapSections?: SapSection[]
+  seo?: { seoTitle?: string; seoDescription?: string; ogImage?: { url?: string } | null }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPage<SAPPage>('sap')
+  const title = page?.seo?.seoTitle || 'SAP Gen AI Developer | Sabareesh'
+  const description = page?.seo?.seoDescription || 'Bridging enterprise SAP ecosystems with the power of generative AI and intelligent automation.'
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: page?.seo?.ogImage?.url ? [{ url: page.seo.ogImage.url }] : [],
+    },
+  }
 }
 
 /* ─── Fallback content ─── */
