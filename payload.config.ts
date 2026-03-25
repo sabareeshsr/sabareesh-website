@@ -14,6 +14,26 @@ const when =
   (data: Record<string, unknown>) =>
     types.includes(data?.pageType as string)
 
+/**
+ * Shorthand to build a Payload RowLabel reference.
+ * `field`  = primary field value to show (e.g. 'bookTitle')
+ * `field2` = optional secondary field (e.g. 'role' for experiences)
+ * `fallback` = prefix when fields are empty (e.g. 'Book')
+ * `separator` = separator between field and field2 (default ' — ')
+ */
+function rl(
+  field: string,
+  fallback: string,
+  field2?: string,
+  separator?: string,
+) {
+  return {
+    path: '@/components/RowLabel',
+    exportName: 'RowLabel',
+    clientProps: { field, fallback, ...(field2 ? { field2 } : {}), ...(separator ? { separator } : {}) },
+  }
+}
+
 export default buildConfig({
   admin: { user: 'users' },
 
@@ -103,7 +123,16 @@ export default buildConfig({
             description: 'Estimated read time. Leave blank to auto-estimate from excerpt.',
           },
         },
-        { name: 'tags', type: 'array', fields: [{ name: 'tag', type: 'text' }], admin: { description: 'Tags used for filtering on the blog page.' } },
+        {
+          name: 'tags',
+          type: 'array',
+          admin: {
+            description: 'Tags used for filtering on the blog page.',
+            initCollapsed: true,
+            components: { RowLabel: rl('tag', 'Tag') },
+          },
+          fields: [{ name: 'tag', type: 'text', required: true }],
+        },
         { name: 'featuredImage', type: 'upload', relationTo: 'media' },
         { name: 'excerpt', type: 'textarea', admin: { description: 'Short summary shown on the blog listing card.' } },
         { name: 'metaDescription', type: 'textarea', label: 'Meta Description (SEO)', admin: { description: 'Used for search engine results. Falls back to Excerpt if blank.' } },
@@ -190,17 +219,24 @@ export default buildConfig({
           admin: {
             condition: when('home'),
             description: 'Each entry cycles through the typewriter animation in the hero.',
+            initCollapsed: true,
+            components: { RowLabel: rl('word', 'Role') },
           },
-          fields: [{ name: 'word', type: 'text', label: 'Word / Role (e.g. "Writer")' }],
+          fields: [{ name: 'word', type: 'text', label: 'Word / Role (e.g. "Writer")', required: true }],
         },
         {
           name: 'skillTiles',
           type: 'array',
           label: 'Skill Tiles (floating cards)',
-          admin: { condition: when('home') },
+          admin: {
+            condition: when('home'),
+            description: 'Four cards that float around the profile photo. Max 4 items.',
+            initCollapsed: true,
+            components: { RowLabel: rl('label', 'Tile') },
+          },
           fields: [
-            { name: 'label', type: 'text', label: 'Label (e.g. "Writer")' },
-            { name: 'icon',  type: 'text', label: 'Icon (emoji or SVG name)' },
+            { name: 'label', type: 'text', label: 'Label (e.g. "Writer")', required: true },
+            { name: 'icon',  type: 'text', label: 'Icon key: book | circuit | chart | robot (or any emoji)' },
             { name: 'link',  type: 'text', label: 'Link URL (e.g. /writer)' },
           ],
         },
@@ -210,13 +246,15 @@ export default buildConfig({
           label: 'Hero CTA Buttons',
           admin: {
             condition: when('home'),
-            description: 'Buttons shown in the hero. Primary = solid blue, Ghost = outlined.',
+            description: 'Buttons shown in the hero section. Primary = solid blue, Ghost = outlined.',
+            initCollapsed: true,
+            components: { RowLabel: rl('label', 'Button') },
           },
           fields: [
-            { name: 'label', type: 'text' },
+            { name: 'label', type: 'text', required: true },
             { name: 'url',   type: 'text', label: 'URL (e.g. /contact or #about)' },
             { name: 'style', type: 'select', options: [
-              { label: 'Primary (solid)', value: 'primary' },
+              { label: 'Primary (solid blue)', value: 'primary' },
               { label: 'Ghost (outlined)', value: 'ghost' },
             ]},
           ],
@@ -253,19 +291,29 @@ export default buildConfig({
           name: 'achievements',
           type: 'array',
           label: 'Achievement Badges',
-          admin: { condition: when('home') },
+          admin: {
+            condition: when('home'),
+            description: 'Short achievement labels displayed as pill badges in the About section.',
+            initCollapsed: true,
+            components: { RowLabel: rl('label', 'Achievement') },
+          },
           fields: [
-            { name: 'label', type: 'text' },
-            { name: 'icon',  type: 'text', label: 'Icon (emoji)' },
+            { name: 'label', type: 'text', required: true },
+            { name: 'icon',  type: 'text', label: 'Icon (emoji, optional)' },
           ],
         },
         {
           name: 'stats',
           type: 'array',
           label: 'Stat Cards',
-          admin: { condition: when('home') },
+          admin: {
+            condition: when('home'),
+            description: 'Numbers shown below the About bio (e.g. "50+ Blogs Written").',
+            initCollapsed: true,
+            components: { RowLabel: rl('value', 'Stat', 'label', ' ') },
+          },
           fields: [
-            { name: 'value', type: 'text', label: 'Value (e.g. "50+")' },
+            { name: 'value', type: 'text', label: 'Value (e.g. "50+")', required: true },
             { name: 'label', type: 'text', label: 'Label (e.g. "Blogs Written")' },
           ],
         },
@@ -276,13 +324,13 @@ export default buildConfig({
         {
           name: 'bookTitle',
           type: 'text',
-          label: 'Book Title (single-book, legacy)',
+          label: 'Book Title (legacy — use Books array below)',
           admin: { condition: when('writer') },
         },
         {
           name: 'bookDescription',
           type: 'richText',
-          label: 'Book Description (single-book, legacy)',
+          label: 'Book Description (legacy)',
           editor: lexicalEditor({}),
           admin: { condition: when('writer') },
         },
@@ -290,32 +338,36 @@ export default buildConfig({
           name: 'bookCover',
           type: 'upload',
           relationTo: 'media',
-          label: 'Book Cover Image (single-book, legacy)',
+          label: 'Book Cover Image (legacy)',
           admin: { condition: when('writer') },
         },
         {
           name: 'amazonLink',
           type: 'text',
-          label: 'Amazon Buy Link (single-book, legacy)',
+          label: 'Amazon Buy Link (legacy)',
           admin: { condition: when('writer') },
         },
         {
           name: 'flipkartLink',
           type: 'text',
-          label: 'Flipkart Buy Link (single-book, legacy)',
+          label: 'Flipkart Buy Link (legacy)',
           admin: { condition: when('writer') },
         },
         {
           name: 'otherStoreLink',
           type: 'text',
-          label: 'Other Store Link (single-book, legacy)',
+          label: 'Other Store Link (legacy)',
           admin: { condition: when('writer') },
         },
         {
           name: 'writerSections',
           type: 'array',
           label: 'Content Sections (legacy — use Additional Sections below)',
-          admin: { condition: when('writer') },
+          admin: {
+            condition: when('writer'),
+            initCollapsed: true,
+            components: { RowLabel: rl('title', 'Section') },
+          },
           fields: [
             { name: 'title',   type: 'text' },
             { name: 'content', type: 'richText', editor: lexicalEditor({}) },
@@ -327,10 +379,12 @@ export default buildConfig({
           label: 'Books',
           admin: {
             condition: when('writer'),
-            description: 'Add one entry per book. Each renders as its own showcase section.',
+            description: 'Add one entry per book. Each renders as its own showcase section on the Writer page.',
+            initCollapsed: false,
+            components: { RowLabel: rl('bookTitle', 'Book') },
           },
           fields: [
-            { name: 'bookTitle',       type: 'text',     label: 'Book Title' },
+            { name: 'bookTitle',       type: 'text',     label: 'Book Title', required: true },
             { name: 'bookDescription', type: 'richText', label: 'Book Description', editor: lexicalEditor({}) },
             { name: 'bookCover',       type: 'upload',   relationTo: 'media', label: 'Book Cover Image' },
             { name: 'amazonLink',      type: 'text',     label: 'Amazon Buy Link' },
@@ -343,7 +397,12 @@ export default buildConfig({
           name: 'additionalSections',
           type: 'array',
           label: 'Additional Sections',
-          admin: { condition: when('writer') },
+          admin: {
+            condition: when('writer'),
+            description: 'Extra content sections rendered below the book showcase.',
+            initCollapsed: true,
+            components: { RowLabel: rl('sectionTitle', 'Section') },
+          },
           fields: [
             { name: 'sectionTitle',   type: 'text',     label: 'Section Title' },
             { name: 'sectionContent', type: 'richText', label: 'Section Content', editor: lexicalEditor({}) },
@@ -357,9 +416,14 @@ export default buildConfig({
           name: 'certifications',
           type: 'array',
           label: 'Certifications',
-          admin: { condition: when('sap') },
+          admin: {
+            condition: when('sap'),
+            description: 'SAP certifications displayed as badge cards.',
+            initCollapsed: true,
+            components: { RowLabel: rl('title', 'Certification') },
+          },
           fields: [
-            { name: 'title',      type: 'text' },
+            { name: 'title',      type: 'text', required: true },
             { name: 'issuer',     type: 'text' },
             { name: 'date',       type: 'text', label: 'Date (e.g. "2024")' },
             { name: 'badgeImage', type: 'upload', relationTo: 'media' },
@@ -370,14 +434,27 @@ export default buildConfig({
           name: 'communityBlogs',
           type: 'array',
           label: 'SAP Community Blog Posts',
-          admin: { condition: when('sap') },
+          admin: {
+            condition: when('sap'),
+            description: 'Blog posts published on SAP Community or other platforms.',
+            initCollapsed: true,
+            components: { RowLabel: rl('title', 'Blog Post') },
+          },
           fields: [
-            { name: 'title',    type: 'text' },
+            { name: 'title',    type: 'text', required: true },
             { name: 'url',      type: 'text', label: 'Blog URL' },
             { name: 'platform', type: 'text', label: 'Platform (e.g. "SAP Community")' },
             { name: 'date',     type: 'text', label: 'Date (e.g. "Jan 2024")' },
-            { name: 'tags',     type: 'array', fields: [{ name: 'tag', type: 'text' }] },
-            { name: 'excerpt',  type: 'textarea' },
+            {
+              name: 'tags',
+              type: 'array',
+              admin: {
+                initCollapsed: true,
+                components: { RowLabel: rl('tag', 'Tag') },
+              },
+              fields: [{ name: 'tag', type: 'text' }],
+            },
+            { name: 'excerpt', type: 'textarea' },
           ],
         },
         {
@@ -397,10 +474,15 @@ export default buildConfig({
           name: 'sapSections',
           type: 'array',
           label: 'Approach Cards',
-          admin: { condition: when('sap') },
+          admin: {
+            condition: when('sap'),
+            description: 'Cards describing the SAP methodology.',
+            initCollapsed: true,
+            components: { RowLabel: rl('title', 'Card') },
+          },
           fields: [
             { name: 'icon',        type: 'text', label: 'Icon (emoji)' },
-            { name: 'title',       type: 'text' },
+            { name: 'title',       type: 'text', required: true },
             { name: 'description', type: 'textarea' },
           ],
         },
@@ -412,9 +494,14 @@ export default buildConfig({
           name: 'experiences',
           type: 'array',
           label: 'Work Experiences',
-          admin: { condition: when('growth') },
+          admin: {
+            condition: when('growth'),
+            description: 'Each experience renders as a card with role, duration, and highlights.',
+            initCollapsed: true,
+            components: { RowLabel: rl('company', 'Experience', 'role') },
+          },
           fields: [
-            { name: 'company',     type: 'text' },
+            { name: 'company',     type: 'text', required: true },
             { name: 'role',        type: 'text' },
             { name: 'duration',    type: 'text', label: 'Duration (e.g. "2022 – Present")' },
             { name: 'description', type: 'textarea' },
@@ -422,7 +509,11 @@ export default buildConfig({
               name: 'highlights',
               type: 'array',
               label: 'Key Highlights',
-              fields: [{ name: 'item', type: 'text' }],
+              admin: {
+                initCollapsed: true,
+                components: { RowLabel: rl('item', 'Highlight') },
+              },
+              fields: [{ name: 'item', type: 'text', required: true }],
             },
           ],
         },
@@ -430,9 +521,14 @@ export default buildConfig({
           name: 'skills',
           type: 'array',
           label: 'Skill Cards',
-          admin: { condition: when('growth') },
+          admin: {
+            condition: when('growth'),
+            description: 'Marketing skill areas shown as cards on the Growth page.',
+            initCollapsed: true,
+            components: { RowLabel: rl('category', 'Skill') },
+          },
           fields: [
-            { name: 'category',    type: 'text', label: 'Skill Name' },
+            { name: 'category',    type: 'text', label: 'Skill Name', required: true },
             { name: 'icon',        type: 'text', label: 'Icon (emoji)' },
             { name: 'description', type: 'textarea' },
           ],
@@ -441,9 +537,14 @@ export default buildConfig({
           name: 'growthStats',
           type: 'array',
           label: 'Stats / Highlights',
-          admin: { condition: when('growth') },
+          admin: {
+            condition: when('growth'),
+            description: 'Key metrics displayed as a stat row.',
+            initCollapsed: true,
+            components: { RowLabel: rl('metric', 'Stat', 'label', ' ') },
+          },
           fields: [
-            { name: 'metric', type: 'text', label: 'Metric Value (e.g. "50+")' },
+            { name: 'metric', type: 'text', label: 'Metric Value (e.g. "50+")', required: true },
             { name: 'label',  type: 'text', label: 'Metric Label (e.g. "Blogs Published")' },
           ],
         },
@@ -455,10 +556,15 @@ export default buildConfig({
           name: 'expertise',
           type: 'array',
           label: 'Expertise Cards',
-          admin: { condition: when('agentic-ai') },
+          admin: {
+            condition: when('agentic-ai'),
+            description: 'Core capability cards (RAG Systems, Vibe Coding, etc.).',
+            initCollapsed: true,
+            components: { RowLabel: rl('title', 'Expertise') },
+          },
           fields: [
             { name: 'icon',        type: 'text', label: 'Icon (emoji)' },
-            { name: 'title',       type: 'text' },
+            { name: 'title',       type: 'text', required: true },
             { name: 'description', type: 'textarea' },
           ],
         },
@@ -466,17 +572,30 @@ export default buildConfig({
           name: 'aiProjects',
           type: 'array',
           label: 'AI Projects',
-          admin: { condition: when('agentic-ai') },
+          admin: {
+            condition: when('agentic-ai'),
+            description: 'Showcase projects with title, status (Live/Beta/WIP), and optional link.',
+            initCollapsed: true,
+            components: { RowLabel: rl('title', 'Project', 'status') },
+          },
           fields: [
             { name: 'icon',        type: 'text', label: 'Icon (emoji)' },
-            { name: 'title',       type: 'text' },
+            { name: 'title',       type: 'text', required: true },
             { name: 'description', type: 'textarea' },
             { name: 'status',      type: 'select', options: [
               { label: 'Live', value: 'Live' },
               { label: 'Beta', value: 'Beta' },
               { label: 'WIP',  value: 'WIP'  },
             ]},
-            { name: 'tags', type: 'array', fields: [{ name: 'tag', type: 'text' }] },
+            {
+              name: 'tags',
+              type: 'array',
+              admin: {
+                initCollapsed: true,
+                components: { RowLabel: rl('tag', 'Tag') },
+              },
+              fields: [{ name: 'tag', type: 'text' }],
+            },
             { name: 'link', type: 'text', label: 'Project URL (optional)' },
           ],
         },
@@ -484,9 +603,13 @@ export default buildConfig({
           name: 'services',
           type: 'array',
           label: 'Services Offered',
-          admin: { condition: when('agentic-ai') },
+          admin: {
+            condition: when('agentic-ai'),
+            initCollapsed: true,
+            components: { RowLabel: rl('title', 'Service') },
+          },
           fields: [
-            { name: 'title',       type: 'text' },
+            { name: 'title',       type: 'text', required: true },
             { name: 'description', type: 'textarea' },
           ],
         },
@@ -494,8 +617,13 @@ export default buildConfig({
           name: 'toolStack',
           type: 'array',
           label: 'Tool Stack (chips)',
-          admin: { condition: when('agentic-ai') },
-          fields: [{ name: 'tool', type: 'text' }],
+          admin: {
+            condition: when('agentic-ai'),
+            description: 'Tools and technologies displayed as chips below the projects.',
+            initCollapsed: true,
+            components: { RowLabel: rl('tool', 'Tool') },
+          },
+          fields: [{ name: 'tool', type: 'text', required: true }],
         },
 
         /* ═══════════════════════════════════════════
@@ -552,8 +680,13 @@ export default buildConfig({
           name: 'subjectOptions',
           type: 'array',
           label: 'Contact Form Subject Options',
-          admin: { condition: when('contact') },
-          fields: [{ name: 'subject', type: 'text' }],
+          admin: {
+            condition: when('contact'),
+            description: 'Options in the Subject dropdown of the contact form.',
+            initCollapsed: true,
+            components: { RowLabel: rl('subject', 'Subject') },
+          },
+          fields: [{ name: 'subject', type: 'text', required: true }],
         },
 
         /* ═══════════════════════════════════════════
@@ -563,11 +696,14 @@ export default buildConfig({
           name: 'seo',
           type: 'group',
           label: 'SEO',
-          admin: { condition: when('home', 'writer', 'sap', 'growth', 'agentic-ai', 'blog', 'contact') },
+          admin: {
+            condition: when('home', 'writer', 'sap', 'growth', 'agentic-ai', 'blog', 'contact'),
+            description: 'Controls what search engines and social platforms display for this page.',
+          },
           fields: [
-            { name: 'seoTitle',       type: 'text',     label: 'SEO Title' },
-            { name: 'seoDescription', type: 'textarea', label: 'SEO Description' },
-            { name: 'ogImage',        type: 'upload',   relationTo: 'media', label: 'Open Graph Image' },
+            { name: 'seoTitle',       type: 'text',     label: 'SEO Title', admin: { description: 'Shown in browser tab and Google results. Defaults to page title if blank.' } },
+            { name: 'seoDescription', type: 'textarea', label: 'SEO Description', admin: { description: 'Shown in Google results. 150–160 characters recommended.' } },
+            { name: 'ogImage',        type: 'upload',   relationTo: 'media', label: 'Open Graph Image', admin: { description: 'Image shown when this page is shared on social media (1200×630px recommended).' } },
           ],
         },
 
@@ -601,14 +737,15 @@ export default buildConfig({
       fields: [
         /* ── Identity ── */
         { name: 'siteName',       type: 'text',     label: 'Site / Brand Name (e.g. "Sabareesh")' },
-        { name: 'seoDescription', type: 'textarea', label: 'Default SEO Description' },
-        { name: 'profileImage',   type: 'upload',   relationTo: 'media', label: 'Profile Image' },
+        { name: 'seoDescription', type: 'textarea', label: 'Default SEO Description (fallback for all pages)' },
+        { name: 'profileImage',   type: 'upload',   relationTo: 'media', label: 'Profile Image (used on home hero)' },
 
         /* ── Social links ── */
         {
           name: 'socialLinks',
           type: 'group',
           label: 'Social Links',
+          admin: { description: 'Used in the site footer and home hero (unless overridden by Hero Social Links).' },
           fields: [
             { name: 'linkedin', type: 'text', label: 'LinkedIn URL' },
             { name: 'twitter',  type: 'text', label: 'Twitter / X URL' },
@@ -622,9 +759,13 @@ export default buildConfig({
           name: 'navLinks',
           type: 'array',
           label: 'Navigation Links',
-          admin: { description: 'Leave empty to use the default nav.' },
+          admin: {
+            description: 'Leave empty to use the default nav. Order determines display order.',
+            initCollapsed: true,
+            components: { RowLabel: rl('label', 'Link') },
+          },
           fields: [
-            { name: 'label', type: 'text' },
+            { name: 'label', type: 'text', required: true },
             { name: 'href',  type: 'text', label: 'URL (e.g. /writer)' },
           ],
         },
@@ -634,10 +775,14 @@ export default buildConfig({
           name: 'footerLinks',
           type: 'array',
           label: 'Footer Links',
+          admin: {
+            initCollapsed: true,
+            components: { RowLabel: rl('label', 'Link') },
+          },
           fields: [
-            { name: 'label',    type: 'text' },
+            { name: 'label',    type: 'text', required: true },
             { name: 'url',      type: 'text' },
-            { name: 'external', type: 'checkbox', defaultValue: false },
+            { name: 'external', type: 'checkbox', defaultValue: false, label: 'Open in new tab' },
           ],
         },
 
