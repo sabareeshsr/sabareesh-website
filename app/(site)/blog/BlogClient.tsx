@@ -19,7 +19,7 @@ const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 function mediaUrl(img: { url?: string; filename?: string } | undefined): string | null {
   if (!img) return null
   if (img.url) return img.url
-  if (img.filename) return `${SERVER_URL}/media/${img.filename}`
+  if (img.filename) return `${SERVER_URL}/api/media/file/${img.filename}`
   return null
 }
 

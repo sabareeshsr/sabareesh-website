@@ -16,7 +16,7 @@ interface Post {
 function mediaUrl(img: { url?: string; filename?: string } | undefined): string | null {
   if (!img) return null
   if (img.url) return img.url
-  if (img.filename) return `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/media/${img.filename}`
+  if (img.filename) return `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/api/media/file/${img.filename}`
   return null
 }
 
