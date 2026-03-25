@@ -9,7 +9,7 @@ interface WriterPage {
   heroSubtitle?: string
   bookTitle?: string
   bookDescription?: object
-  bookCover?: { url?: string; alt?: string } | null
+  bookCover?: { url?: string; filename?: string; alt?: string } | null
   amazonLink?: string
   flipkartLink?: string
   otherStoreLink?: string
@@ -45,7 +45,9 @@ export default async function WriterPage() {
   const bookTitle  = page?.bookTitle   || FB.bookTitle
   const amazonLink = page?.amazonLink  || FB.amazonLink
   const flipkartLink = page?.flipkartLink || FB.flipkartLink
-  const coverUrl   = (page?.bookCover as any)?.url || null
+  const serverUrl  = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+  const coverUrl   = page?.bookCover?.url
+    || (page?.bookCover?.filename ? `${serverUrl}/media/${page.bookCover.filename}` : null)
 
   return (
     <main className="bg-[#020617] min-h-screen">

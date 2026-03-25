@@ -10,8 +10,17 @@ interface Post {
   excerpt?: string
   publishedDate?: string
   tags?: Array<{ tag: string }>
-  featuredImage?: { url?: string; alt?: string }
+  featuredImage?: { url?: string; filename?: string; alt?: string }
   readTime?: number
+}
+
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+
+function mediaUrl(img: { url?: string; filename?: string } | undefined): string | null {
+  if (!img) return null
+  if (img.url) return img.url
+  if (img.filename) return `${SERVER_URL}/media/${img.filename}`
+  return null
 }
 
 function estimateReadTime(excerpt: string | undefined): number {
@@ -129,12 +138,13 @@ export default function BlogClient({ posts }: { posts: Post[] }) {
             const date = formatDate(post.publishedDate)
             const tag  = post.tags?.[0]?.tag
 
+            const imgUrl = mediaUrl(post.featuredImage)
             return (
               <Link key={post.id} href={`/blog/${slug}`} className={`${GLASS} flex flex-col group hover:border-[rgba(96,165,250,0.35)] hover:bg-[rgba(96,165,250,0.03)] transition-all duration-200`}>
                 {/* Featured image */}
                 <div className="relative h-[200px] overflow-hidden rounded-t-[24px] bg-[rgba(96,165,250,0.06)]">
-                  {post.featuredImage?.url ? (
-                    <Image src={post.featuredImage.url} alt={post.featuredImage.alt ?? post.title} fill className="object-cover group-hover:scale-[1.03] transition-transform duration-300" sizes="(max-width: 768px) 100vw, 33vw" />
+                  {imgUrl ? (
+                    <Image src={imgUrl} alt={post.featuredImage?.alt ?? post.title} fill className="object-cover group-hover:scale-[1.03] transition-transform duration-300" sizes="(max-width: 768px) 100vw, 33vw" />
                   ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
                       <span className="text-4xl opacity-40">📝</span>

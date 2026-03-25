@@ -9,8 +9,15 @@ import RichText from '@/components/RichText'
 interface Post {
   id: string; title: string; slug?: string; excerpt?: string
   publishedDate?: string; tags?: Array<{ tag: string }>
-  featuredImage?: { url?: string; alt?: string }
+  featuredImage?: { url?: string; filename?: string; alt?: string }
   content?: object
+}
+
+function mediaUrl(img: { url?: string; filename?: string } | undefined): string | null {
+  if (!img) return null
+  if (img.url) return img.url
+  if (img.filename) return `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/media/${img.filename}`
+  return null
 }
 
 async function getPost(slug: string): Promise<Post | null> {
@@ -67,7 +74,7 @@ export async function generateMetadata(
     openGraph: {
       title: post.title,
       description: post.excerpt ?? '',
-      images: post.featuredImage?.url ? [{ url: post.featuredImage.url }] : [],
+      images: mediaUrl(post.featuredImage) ? [{ url: mediaUrl(post.featuredImage)! }] : [],
     },
   }
 }
@@ -135,13 +142,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       </section>
 
       {/* ── FEATURED IMAGE ── */}
-      {post.featuredImage?.url && (
+      {mediaUrl(post.featuredImage) && (
         <section className="px-6 pb-12">
           <div className="max-w-[860px] mx-auto">
             <div className="relative h-[300px] md:h-[460px] rounded-[24px] overflow-hidden">
               <Image
-                src={post.featuredImage.url}
-                alt={post.featuredImage.alt ?? post.title}
+                src={mediaUrl(post.featuredImage)!}
+                alt={post.featuredImage?.alt ?? post.title}
                 fill className="object-cover"
                 priority sizes="860px"
               />

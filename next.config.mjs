@@ -2,9 +2,21 @@ import { withPayload } from '@payloadcms/next/withPayload'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Allow serving uploaded media from /public/media
   images: {
-    remotePatterns: [],
+    remotePatterns: [
+      // Netlify production
+      {
+        protocol: 'https',
+        hostname: '**.netlify.app',
+        pathname: '/media/**',
+      },
+      // Local dev
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        pathname: '/media/**',
+      },
+    ],
   },
 }
 
