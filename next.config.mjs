@@ -22,17 +22,34 @@ const nextConfig = {
         port: '3000',
         pathname: '/api/media/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3000',
+        pathname: '/media/**',
+      },
       // Payload media on Netlify production
       {
         protocol: 'https',
         hostname: 'sabareesh-website.netlify.app',
         pathname: '/api/media/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'sabareesh-website.netlify.app',
+        pathname: '/media/**',
+      },
       // Any Netlify preview deploys
       {
         protocol: 'https',
         hostname: '**.netlify.app',
-        pathname: '/api/media/**',
+        pathname: '/**',
+      },
+      // Cloudinary CDN
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
       },
     ],
   },

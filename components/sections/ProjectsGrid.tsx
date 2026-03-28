@@ -1,5 +1,3 @@
-import Image from 'next/image'
-
 export interface ProjectsGridBlockData {
   blockType: 'projects-grid'
   sectionLabel?: string
@@ -52,7 +50,7 @@ export default function ProjectsGrid({ data }: { data: ProjectsGridBlockData }) 
               <div key={i} className={`${GLASS} flex flex-col overflow-hidden hover:border-[rgba(96,165,250,0.3)] transition-colors duration-200`}>
                 {imgUrl && (
                   <div className="relative h-[180px] w-full bg-[rgba(255,255,255,0.03)]">
-                    <Image src={imgUrl} alt={project.title} fill className="object-cover" sizes="600px" />
+                    <img src={imgUrl} alt={project.title} className="w-full h-full object-cover" />
                   </div>
                 )}
                 <div className="p-6 flex flex-col gap-3 flex-1">

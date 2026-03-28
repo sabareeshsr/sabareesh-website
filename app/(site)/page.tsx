@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import Typewriter from '@/components/Typewriter'
 import RichText from '@/components/RichText'
@@ -66,7 +65,7 @@ function ProfilePhoto({ size, src }: { size: number; src?: string | null }) {
     <div className="relative rounded-full p-[4px] shadow-[0px_0px_48px_12px_rgba(96,165,250,0.35)]"
          style={{ width: size, height: size, background: 'linear-gradient(135deg, #60a5fa 0%, #94ccff 50%, #2563eb 100%)' }}>
       <div className="relative size-full rounded-full overflow-hidden border-[5px] border-[#070d1f]">
-        <Image src={src || '/profile.jpg'} alt="Sabareesh profile photo" fill className="object-cover object-top" priority />
+        <img src={src || '/profile.jpg'} alt="Sabareesh profile photo" className="w-full h-full object-cover object-top" />
       </div>
       <div className="absolute inset-0 rounded-full shadow-[inset_0px_0px_24px_4px_rgba(148,204,255,0.2)] pointer-events-none" />
     </div>
@@ -185,7 +184,7 @@ export default async function Home() {
                 return (
                   <Link key={tile.label} href={tile.link} className={`${TILE_BASE} ${floats[i] || 'float-tile-1'} ${positions[i] || ''} absolute hover:scale-110 hover:border-[rgba(96,165,250,0.5)] hover:bg-[rgba(96,165,250,0.12)] hover:shadow-[0px_0px_24px_4px_rgba(96,165,250,0.25)] transition-all duration-200 cursor-pointer`}>
                     {tile.iconImage?.url
-                      ? <Image src={tile.iconImage.url} alt={tile.label} width={36} height={36} className="object-contain" />
+                      ? <img src={tile.iconImage.url} alt={tile.label} width={36} height={36} className="object-contain" />
                       : TILE_ICONS[tile.icon] || <span className="text-2xl">{tile.icon}</span>}
                     <span className={TILE_LABEL}>{tile.label}</span>
                   </Link>
@@ -199,7 +198,7 @@ export default async function Home() {
                 {skillTiles.map((tile, i) => (
                   <Link key={tile.label} href={tile.link} className={`${TILE_BASE} float-tile-${(i % 4) + 1} hover:scale-105 hover:border-[rgba(96,165,250,0.5)] hover:bg-[rgba(96,165,250,0.12)] transition-all duration-200`}>
                     {tile.iconImage?.url
-                      ? <Image src={tile.iconImage.url} alt={tile.label} width={36} height={36} className="object-contain" />
+                      ? <img src={tile.iconImage.url} alt={tile.label} width={36} height={36} className="object-contain" />
                       : TILE_ICONS[tile.icon] || <span className="text-2xl">{tile.icon}</span>}
                     <span className={TILE_LABEL}>{tile.label}</span>
                   </Link>

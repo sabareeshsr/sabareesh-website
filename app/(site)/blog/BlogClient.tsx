@@ -1,6 +1,5 @@
 'use client'
 import { useState, useMemo } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 
 interface Post {
@@ -144,7 +143,7 @@ export default function BlogClient({ posts }: { posts: Post[] }) {
                 {/* Featured image */}
                 <div className="relative h-[200px] overflow-hidden rounded-t-[24px] bg-[rgba(96,165,250,0.06)]">
                   {imgUrl ? (
-                    <Image src={imgUrl} alt={post.featuredImage?.alt ?? post.title} fill className="object-cover group-hover:scale-[1.03] transition-transform duration-300" sizes="(max-width: 768px) 100vw, 33vw" />
+                    <img src={imgUrl} alt={post.featuredImage?.alt ?? post.title} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
                   ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
                       <span className="text-4xl opacity-40">📝</span>

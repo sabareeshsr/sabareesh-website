@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import RichText from '@/components/RichText'
 
 export interface ExperienceBlockData {
@@ -53,7 +52,7 @@ export default function ExperienceSection({ data }: { data: ExperienceBlockData 
               <div key={i} className={`${GLASS} p-7 flex gap-6 items-start`}>
                 {logoUrl && (
                   <div className="shrink-0 w-14 h-14 rounded-[12px] overflow-hidden bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] flex items-center justify-center">
-                    <Image src={logoUrl} alt={exp.company} width={56} height={56} className="object-contain" />
+                    <img src={logoUrl} alt={exp.company} width={56} height={56} className="object-contain" />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">

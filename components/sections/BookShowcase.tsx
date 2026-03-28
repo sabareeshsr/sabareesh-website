@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import RichText from '@/components/RichText'
 
 export interface BookShowcaseBlockData {
@@ -48,7 +47,7 @@ export default function BookShowcase({ data }: { data: BookShowcaseBlockData }) 
                 style={{ background: 'linear-gradient(160deg, rgba(96,165,250,0.15) 0%, rgba(37,99,235,0.08) 100%)' }}
               >
                 {coverUrl ? (
-                  <Image src={coverUrl} alt={`${title} cover`} fill className="object-cover" sizes="210px" />
+                  <img src={coverUrl} alt={`${title} cover`} className="w-full h-full object-cover" />
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 border border-[rgba(96,165,250,0.2)] rounded-[16px]">
                     <span className="text-5xl">📖</span>

@@ -1,5 +1,3 @@
-import Image from 'next/image'
-
 export interface FeatureTile {
   icon?: { url?: string } | null
   iconEmoji?: string
@@ -54,7 +52,7 @@ export default function FeatureTilesSection({ sectionLabel, sectionHeading, tile
             >
               <div className="mb-5">
                 {tile.icon?.url ? (
-                  <Image
+                  <img
                     src={tile.icon.url}
                     alt={tile.title}
                     width={48}

@@ -1,5 +1,3 @@
-import Image from 'next/image'
-
 export interface CertificationsBlockData {
   blockType: 'certifications'
   sectionLabel?: string
@@ -52,7 +50,7 @@ export default function Certifications({ data }: { data: CertificationsBlockData
               <div key={i} className={`${GLASS} p-6 flex gap-4 items-start hover:border-[rgba(96,165,250,0.3)] transition-colors duration-200`}>
                 {badgeUrl && (
                   <div className="shrink-0 w-12 h-12 rounded-[10px] overflow-hidden bg-white/5">
-                    <Image src={badgeUrl} alt={cert.title} width={48} height={48} className="object-contain" />
+                    <img src={badgeUrl} alt={cert.title} width={48} height={48} className="object-contain" />
                   </div>
                 )}
                 <div className="min-w-0">

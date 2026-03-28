@@ -1,7 +1,6 @@
 export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
@@ -141,11 +140,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <section className="px-6 pb-12">
           <div className="max-w-[860px] mx-auto">
             <div className="relative h-[300px] md:h-[460px] rounded-[24px] overflow-hidden">
-              <Image
+              <img
                 src={mediaUrl(post.featuredImage)!}
                 alt={post.featuredImage?.alt ?? post.title}
-                fill className="object-cover"
-                priority sizes="860px"
+                className="w-full h-full object-cover"
               />
             </div>
           </div>
