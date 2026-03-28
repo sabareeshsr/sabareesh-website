@@ -3,16 +3,6 @@ import { withPayload } from '@payloadcms/next/withPayload'
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   serverExternalPackages: ['sharp'],
-  experimental: {
-    turbo: {
-      rules: {
-        '*.css': {
-          loaders: ['ignore-loader'],
-          as: '*.css',
-        },
-      },
-    },
-  },
   images: {
     remotePatterns: [
       // Payload media served locally in dev

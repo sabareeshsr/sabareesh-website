@@ -42,6 +42,14 @@ export default function BookTemplate({ heroTitle, heroSubtitle, badge = 'Creativ
       {/* ── CONTENT BLOCKS ── */}
       <ContentBlocks blocks={contentBlocks} />
 
+      {/* ── FALLBACK when no blocks saved yet ── */}
+      {(!contentBlocks || contentBlocks.length === 0) && (
+        <div className="text-center py-20 text-white/40">
+          <p>No content blocks yet.</p>
+          <p className="text-sm mt-2">Go to /admin → Pages → Writer to add content.</p>
+        </div>
+      )}
+
     </main>
   )
 }

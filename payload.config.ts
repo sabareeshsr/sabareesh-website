@@ -2,7 +2,6 @@ import path from 'path'
 import { buildConfig, type Block } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { cloudinaryStorage } from 'payload-cloudinary'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
@@ -1254,15 +1253,5 @@ export default buildConfig({
     },
     migrationDir: './migrations',
   }),
-  plugins: [
-    cloudinaryStorage({
-      collections: { media: true },
-      config: {
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
-        api_key: process.env.CLOUDINARY_API_KEY!,
-        api_secret: process.env.CLOUDINARY_API_SECRET!,
-      },
-    }),
-  ],
   sharp,
 })
