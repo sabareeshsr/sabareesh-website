@@ -1,6 +1,6 @@
 'use client'
 import { useActionState } from 'react'
-import { submitContact, type ContactResult } from './actions'
+import { submitContact, type ContactResult } from '@/app/(site)/contact/actions'
 
 const DEFAULT_SUBJECTS = [
   'SAP Gen AI Project',

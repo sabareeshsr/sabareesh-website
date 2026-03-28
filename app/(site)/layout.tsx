@@ -18,22 +18,35 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: 'swap',
 })
 
-export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSiteSettings()
-  const title = settings?.siteTitle || 'Sabareesh | Writer, SAP GenAI Dev & AI Builder'
-  const description = settings?.siteDescription || settings?.seoDescription || 'SAP Gen AI Developer, Growth Marketer, Published Author, and Agentic AI Builder.'
-  const faviconUrl = settings?.favicon?.url || null
-  const ogImageUrl = settings?.ogImage?.url || null
+const FALLBACK_METADATA = {
+  title: 'Sabareesh | Writer, SAP GenAI Dev & AI Builder',
+  description: 'SAP Gen AI Developer, Growth Marketer, Published Author, and Agentic AI Builder.',
+}
 
-  return {
-    title,
-    description,
-    ...(faviconUrl ? { icons: { icon: faviconUrl } } : {}),
-    openGraph: {
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const settings = await Promise.race([
+      getSiteSettings(),
+      new Promise<null>((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
+    ])
+
+    const title = settings?.siteTitle || FALLBACK_METADATA.title
+    const description = settings?.siteDescription || settings?.seoDescription || FALLBACK_METADATA.description
+    const faviconUrl = settings?.favicon?.url || null
+    const ogImageUrl = settings?.ogImage?.url || null
+
+    return {
       title,
       description,
-      ...(ogImageUrl ? { images: [{ url: ogImageUrl }] } : {}),
-    },
+      ...(faviconUrl ? { icons: { icon: faviconUrl } } : {}),
+      openGraph: {
+        title,
+        description,
+        ...(ogImageUrl ? { images: [{ url: ogImageUrl }] } : {}),
+      },
+    }
+  } catch {
+    return FALLBACK_METADATA
   }
 }
 

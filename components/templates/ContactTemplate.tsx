@@ -1,38 +1,19 @@
-import type { Metadata } from 'next'
 import ContactForm from '@/components/ContactForm'
-import { getPage } from '@/lib/getPage'
 
-interface ContactPageDoc {
-  heroTitle?: string
+export interface ContactTemplateProps {
+  heroTitle: string
   heroSubtitle?: string
-  contactEmail?: string
-  contactLinkedin?: string
-  contactTwitter?: string
-  contactGithub?: string
-  availability?: string
+  email?: string
+  linkedin?: string
+  twitter?: string
+  github?: string | null
+  availability?: string | null
   formTitle?: string
-  subjectOptions?: Array<{ subject: string }>
-  seo?: { seoTitle?: string; seoDescription?: string; ogImage?: { url?: string } | null }
-}
-
-export async function generateMetadata(): Promise<Metadata> {
-  const page = await getPage<ContactPageDoc>('contact')
-  const title = page?.seo?.seoTitle || 'Contact | Sabareesh'
-  const description = page?.seo?.seoDescription || 'Get in touch with Sabareesh — for SAP AI projects, growth marketing, writing collaborations, or anything else.'
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      images: page?.seo?.ogImage?.url ? [{ url: page.seo.ogImage.url }] : [],
-    },
-  }
+  subjectOptions?: string[]
 }
 
 const GLASS = 'backdrop-blur-[16px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-[24px]'
 
-/* SVG icons */
 const EmailIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -55,22 +36,23 @@ const GitHubIcon = () => (
     <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
   </svg>
 )
+const ArrowIcon = () => (
+  <svg className="ml-auto shrink-0 text-[#334155] group-hover:text-[#60a5fa] group-hover:translate-x-0.5 transition-all" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M5 12h14M12 5l7 7-7 7"/>
+  </svg>
+)
 
-export default async function ContactPage() {
-  const page = await getPage<ContactPageDoc>('contact')
-
-  const heroTitle    = page?.heroTitle    || 'Let\'s Connect'
-  const heroSub      = page?.heroSubtitle || 'Whether it\'s an SAP AI project, a growth challenge, a writing collaboration, or just a conversation — I\'d love to hear from you.'
-  const email        = page?.contactEmail    || 'hello@sabareesh.com'
-  const linkedin     = page?.contactLinkedin || 'https://linkedin.com/in/sabareesh'
-  const twitter      = page?.contactTwitter  || 'https://twitter.com/sabareesh'
-  const github       = page?.contactGithub   || null
-  const availability = page?.availability    || null
-  const formTitle    = page?.formTitle       || undefined
-  const subjectOpts  = page?.subjectOptions?.length
-    ? page.subjectOptions.map((o) => o.subject).filter(Boolean)
-    : undefined
-
+export default function ContactTemplate({
+  heroTitle,
+  heroSubtitle,
+  email = 'hello@sabareesh.com',
+  linkedin = 'https://linkedin.com/in/sabareesh',
+  twitter = 'https://twitter.com/sabareesh',
+  github,
+  availability,
+  formTitle,
+  subjectOptions,
+}: ContactTemplateProps) {
   const contacts = [
     { icon: <EmailIcon />, label: 'Email', value: email, href: `mailto:${email}`, external: false },
     { icon: <LinkedInIcon />, label: 'LinkedIn', value: linkedin.replace('https://', ''), href: linkedin, external: true },
@@ -99,9 +81,11 @@ export default async function ContactPage() {
                 {heroTitle}
               </span>
             </h1>
-            <p className="font-inter text-[18px] text-[#94a3b8] leading-[1.75] max-w-[540px]">
-              {heroSub}
-            </p>
+            {heroSubtitle && (
+              <p className="font-inter text-[18px] text-[#94a3b8] leading-[1.75] max-w-[540px]">
+                {heroSubtitle}
+              </p>
+            )}
           </div>
         </div>
       </section>
@@ -112,7 +96,6 @@ export default async function ContactPage() {
 
           {/* ── LEFT: Contact info ── */}
           <div className="flex flex-col gap-6">
-            {/* Intro card */}
             <div className={`${GLASS} p-7`}>
               <h2 className="font-plus-jakarta font-bold text-[22px] text-white mb-3">Direct Channels</h2>
               <p className="font-inter text-[15px] text-[#94a3b8] leading-[1.75]">
@@ -120,7 +103,6 @@ export default async function ContactPage() {
               </p>
             </div>
 
-            {/* Contact links */}
             <div className="flex flex-col gap-4">
               {contacts.map(({ icon, label, value, href, external }) => (
                 <a
@@ -138,14 +120,11 @@ export default async function ContactPage() {
                     <p className="font-inter text-[12px] text-[#64748b] uppercase tracking-wide mb-0.5">{label}</p>
                     <p className="font-inter text-[14px] text-white group-hover:text-[#60a5fa] transition-colors truncate">{value}</p>
                   </div>
-                  <svg className="ml-auto shrink-0 text-[#334155] group-hover:text-[#60a5fa] group-hover:translate-x-0.5 transition-all" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                  </svg>
+                  <ArrowIcon />
                 </a>
               ))}
             </div>
 
-            {/* Availability or response time note */}
             <div className="flex items-start gap-3 px-5 py-4 bg-[rgba(148,204,255,0.04)] border border-[rgba(148,204,255,0.1)] rounded-[16px]">
               <span className="text-xl shrink-0">⏱️</span>
               <p className="font-inter text-[14px] text-[#64748b] leading-[1.6]">
@@ -161,7 +140,7 @@ export default async function ContactPage() {
           <div className={`${GLASS} p-8 md:p-10`}>
             <h2 className="font-plus-jakarta font-bold text-[24px] text-white mb-2">Send a Message</h2>
             <p className="font-inter text-[15px] text-[#64748b] mb-8">Fill in the details and I'll get back to you shortly.</p>
-            <ContactForm formTitle={formTitle} subjectOptions={subjectOpts} />
+            <ContactForm formTitle={formTitle} subjectOptions={subjectOptions} />
           </div>
 
         </div>

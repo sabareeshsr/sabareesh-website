@@ -2,9 +2,9 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { unstable_noStore as noStore } from 'next/cache'
 
-/** Fetch a single page document from Payload by URL slug. Returns null on error or timeout. */
-export async function getPage<T = Record<string, unknown>>(slug: string): Promise<T | null> {
-  noStore() // opt out of Next.js static caching — always read live data
+/** Fetch a page document from Payload by URL slug. Returns null on error, timeout, or not found. */
+export async function getPageBySlug<T = Record<string, unknown>>(slug: string): Promise<T | null> {
+  noStore()
   try {
     const payload = await getPayload({ config: configPromise })
     const result = await Promise.race([

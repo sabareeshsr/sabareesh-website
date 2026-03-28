@@ -8,11 +8,11 @@ import { fileURLToPath } from 'url'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-/* Helper: only show a field when pageType matches */
+/* Helper: show a field when pageTemplate matches any of the provided template values */
 const when =
   (...types: string[]) =>
   (data: Record<string, unknown>) =>
-    types.includes(data?.pageType as string)
+    types.includes(data?.pageTemplate as string)
 
 /**
  * Shorthand to build a Payload RowLabel reference.
@@ -170,35 +170,37 @@ export default buildConfig({
       admin: {
         group: 'Content',
         useAsTitle: 'pageName',
-        defaultColumns: ['pageName', 'pageType', 'slug', 'updatedAt'],
-        description: 'One document per page. Use Page Type to select which page you are editing.',
+        defaultColumns: ['pageName', 'pageTemplate', 'slug', 'updatedAt'],
+        description: 'One document per page. Choose a template, set the URL slug, then fill in the fields for that template.',
       },
       fields: [
         /* ── Identity ── */
         {
           name: 'pageName',
           type: 'text',
+          required: true,
           label: 'Page Name',
           admin: {
-            description: 'Internal name for this page — e.g. "Writer Page", "SAP Page". Used in the admin list.',
+            description: 'Internal name — e.g. "Five Days Forever" or "SAP Page". Shown in the admin list.',
           },
         },
 
-        /* ── Selector (always visible, sidebar) ── */
+        /* ── Template selector (sidebar) ── */
         {
-          name: 'pageType',
+          name: 'pageTemplate',
           type: 'select',
-          required: true,
-          unique: true,
-          admin: { position: 'sidebar' },
+          required: false,
+          admin: {
+            position: 'sidebar',
+            description: 'Choose the layout template for this page.',
+          },
           options: [
-            { label: '🏠 Home',        value: 'home' },
-            { label: '✍️ Writer',      value: 'writer' },
-            { label: '🔷 SAP',         value: 'sap' },
-            { label: '📈 Growth',      value: 'growth' },
-            { label: '🤖 Agentic AI',  value: 'agentic-ai' },
-            { label: '📝 Blog',        value: 'blog' },
-            { label: '📬 Contact',     value: 'contact' },
+            { label: '🏠 Home',                        value: 'home' },
+            { label: '📚 Book / Publication',           value: 'book' },
+            { label: '🏆 Expertise / Skills',           value: 'expertise' },
+            { label: '📄 Standard / General',           value: 'standard' },
+            { label: '📬 Contact',                     value: 'contact' },
+            { label: '📝 Blog Index',                  value: 'blog-index' },
           ],
         },
 
@@ -234,14 +236,13 @@ export default buildConfig({
         {
           name: 'heroTitle',
           type: 'text',
-          label: 'Hero Title',
-          admin: { condition: when('home', 'writer', 'sap', 'growth', 'agentic-ai', 'blog', 'contact') },
+          label: 'Page Heading',
+          admin: { description: 'Main heading shown on the page.' },
         },
         {
           name: 'heroSubtitle',
           type: 'text',
-          label: 'Hero Subtitle',
-          admin: { condition: when('home', 'writer', 'sap', 'growth', 'agentic-ai', 'blog', 'contact') },
+          label: 'Page Subheading',
         },
 
         /* ═══════════════════════════════════════════
@@ -339,14 +340,14 @@ export default buildConfig({
           name: 'aboutTitle',
           type: 'text',
           label: 'About Section Heading',
-          admin: { condition: when('home') },
+          admin: { condition: when('home', 'standard') },
         },
         {
           name: 'aboutBio',
           type: 'richText',
           label: 'About Section Body',
           editor: lexicalEditor({}),
-          admin: { condition: when('home') },
+          admin: { condition: when('home', 'standard') },
         },
         {
           name: 'achievements',
@@ -386,14 +387,14 @@ export default buildConfig({
           name: 'bookTitle',
           type: 'text',
           label: 'Book Title (legacy — use Books array below)',
-          admin: { condition: when('writer') },
+          admin: { condition: () => false },
         },
         {
           name: 'bookDescription',
           type: 'richText',
           label: 'Book Description (legacy)',
           editor: lexicalEditor({}),
-          admin: { condition: when('writer') },
+          admin: { condition: () => false },
         },
         {
           name: 'bookCover',
@@ -406,19 +407,19 @@ export default buildConfig({
           name: 'amazonLink',
           type: 'text',
           label: 'Amazon Buy Link (legacy)',
-          admin: { condition: when('writer') },
+          admin: { condition: () => false },
         },
         {
           name: 'flipkartLink',
           type: 'text',
           label: 'Flipkart Buy Link (legacy)',
-          admin: { condition: when('writer') },
+          admin: { condition: () => false },
         },
         {
           name: 'otherStoreLink',
           type: 'text',
           label: 'Other Store Link (legacy)',
-          admin: { condition: when('writer') },
+          admin: { condition: () => false },
         },
         {
           name: 'writerSections',
@@ -439,8 +440,8 @@ export default buildConfig({
           type: 'array',
           label: 'Books',
           admin: {
-            condition: when('writer'),
-            description: 'Add one entry per book. Each renders as its own showcase section on the Writer page.',
+            condition: when('book'),
+            description: 'Add one entry per book. Each renders as its own showcase section on the page.',
             initCollapsed: false,
             components: { RowLabel: rl('bookTitle', 'Book') },
           },
@@ -459,8 +460,8 @@ export default buildConfig({
           type: 'array',
           label: 'Additional Sections',
           admin: {
-            condition: when('writer'),
-            description: 'Extra content sections rendered below the book showcase.',
+            condition: when('book', 'standard'),
+            description: 'Extra content sections rendered below the main content.',
             initCollapsed: true,
             components: { RowLabel: rl('sectionTitle', 'Section') },
           },
@@ -478,7 +479,7 @@ export default buildConfig({
           type: 'array',
           label: 'Certifications',
           admin: {
-            condition: when('sap'),
+            condition: when('expertise'),
             description: 'SAP certifications displayed as badge cards.',
             initCollapsed: true,
             components: { RowLabel: rl('title', 'Certification') },
@@ -496,7 +497,7 @@ export default buildConfig({
           type: 'array',
           label: 'SAP Community Blog Posts',
           admin: {
-            condition: when('sap'),
+            condition: when('expertise'),
             description: 'Blog posts published on SAP Community or other platforms.',
             initCollapsed: true,
             components: { RowLabel: rl('title', 'Blog Post') },
@@ -522,21 +523,21 @@ export default buildConfig({
           name: 'approachTitle',
           type: 'text',
           label: 'Approach Section Title',
-          admin: { condition: when('sap') },
+          admin: { condition: when('expertise') },
         },
         {
           name: 'approachContent',
           type: 'richText',
           label: 'Approach Content',
           editor: lexicalEditor({}),
-          admin: { condition: when('sap') },
+          admin: { condition: when('expertise') },
         },
         {
           name: 'sapSections',
           type: 'array',
           label: 'Approach Cards',
           admin: {
-            condition: when('sap'),
+            condition: when('expertise'),
             description: 'Cards describing the SAP methodology.',
             initCollapsed: true,
             components: { RowLabel: rl('title', 'Card') },
@@ -556,7 +557,7 @@ export default buildConfig({
           type: 'array',
           label: 'Work Experiences',
           admin: {
-            condition: when('growth'),
+            condition: when('expertise'),
             description: 'Each experience renders as a card with role, duration, and highlights.',
             initCollapsed: true,
             components: { RowLabel: rl('company', 'Experience', 'role') },
@@ -583,7 +584,7 @@ export default buildConfig({
           type: 'array',
           label: 'Skill Cards',
           admin: {
-            condition: when('growth'),
+            condition: when('expertise'),
             description: 'Marketing skill areas shown as cards on the Growth page.',
             initCollapsed: true,
             components: { RowLabel: rl('category', 'Skill') },
@@ -599,7 +600,7 @@ export default buildConfig({
           type: 'array',
           label: 'Stats / Highlights',
           admin: {
-            condition: when('growth'),
+            condition: when('expertise'),
             description: 'Key metrics displayed as a stat row.',
             initCollapsed: true,
             components: { RowLabel: rl('metric', 'Stat', 'label', ' ') },
@@ -618,7 +619,7 @@ export default buildConfig({
           type: 'array',
           label: 'Expertise Cards',
           admin: {
-            condition: when('agentic-ai'),
+            condition: when('expertise'),
             description: 'Core capability cards (RAG Systems, Vibe Coding, etc.).',
             initCollapsed: true,
             components: { RowLabel: rl('title', 'Expertise') },
@@ -634,7 +635,7 @@ export default buildConfig({
           type: 'array',
           label: 'AI Projects',
           admin: {
-            condition: when('agentic-ai'),
+            condition: when('expertise'),
             description: 'Showcase projects with title, status (Live/Beta/WIP), and optional link.',
             initCollapsed: true,
             components: { RowLabel: rl('title', 'Project', 'status') },
@@ -665,7 +666,7 @@ export default buildConfig({
           type: 'array',
           label: 'Services Offered',
           admin: {
-            condition: when('agentic-ai'),
+            condition: when('expertise'),
             initCollapsed: true,
             components: { RowLabel: rl('title', 'Service') },
           },
@@ -679,7 +680,7 @@ export default buildConfig({
           type: 'array',
           label: 'Tool Stack (chips)',
           admin: {
-            condition: when('agentic-ai'),
+            condition: when('expertise'),
             description: 'Tools and technologies displayed as chips below the projects.',
             initCollapsed: true,
             components: { RowLabel: rl('tool', 'Tool') },
@@ -695,7 +696,7 @@ export default buildConfig({
           type: 'relationship',
           relationTo: 'blog-posts',
           label: 'Featured / Pinned Post',
-          admin: { condition: when('blog') },
+          admin: { condition: when('blog-index') },
         },
 
         /* ═══════════════════════════════════════════
@@ -758,7 +759,6 @@ export default buildConfig({
           type: 'group',
           label: 'SEO',
           admin: {
-            condition: when('home', 'writer', 'sap', 'growth', 'agentic-ai', 'blog', 'contact'),
             description: 'Controls what search engines and social platforms display for this page.',
           },
           fields: [
