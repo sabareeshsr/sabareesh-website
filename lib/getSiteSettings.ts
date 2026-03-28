@@ -3,7 +3,11 @@ import configPromise from '@payload-config'
 
 export interface SiteSettings {
   siteName?: string
+  siteTitle?: string
+  siteDescription?: string
   seoDescription?: string
+  favicon?: { url?: string } | null
+  ogImage?: { url?: string } | null
   profileImage?: { url?: string; alt?: string } | null
   socialLinks?: { linkedin?: string; twitter?: string; github?: string; email?: string }
   navLinks?: Array<{ label: string; href: string }>

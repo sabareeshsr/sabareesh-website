@@ -12,7 +12,8 @@
       "Bash(mv agentic-ai/page.tsx \"\\(site\\)/agentic-ai/page.tsx\")",
       "Bash(mv blog/page.tsx \"\\(site\\)/blog/page.tsx\")",
       "Bash(mv \"blog/[slug]/page.tsx\" \"\\(site\\)/blog/[slug]/page.tsx\")",
-      "Bash(mv contact/page.tsx \"\\(site\\)/contact/page.tsx\")"
+      "Bash(mv contact/page.tsx \"\\(site\\)/contact/page.tsx\")",
+      "Bash(ls:*)"
     ]
   }
 }

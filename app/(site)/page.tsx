@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import Typewriter from '@/components/Typewriter'
+import RichText from '@/components/RichText'
 import { getPage } from '@/lib/getPage'
 import { getSiteSettings } from '@/lib/getSiteSettings'
 
@@ -73,10 +74,11 @@ interface HomePageData {
   heroName?: string
   heroBio?: string
   typewriterWords?: Array<{ word: string }>
-  skillTiles?: Array<{ label: string; icon: string; link: string }>
+  skillTiles?: Array<{ label: string; icon: string; iconImage?: { url?: string } | null; link: string }>
   ctaButtons?: Array<{ label: string; url: string; style: string }>
   homeSocialLinks?: { linkedin?: string; twitter?: string; github?: string; email?: string }
   aboutTitle?: string
+  aboutBio?: object
   achievements?: Array<{ label: string; icon?: string }>
   stats?: Array<{ value: string; label: string }>
   seo?: SeoData
@@ -175,7 +177,9 @@ export default async function Home() {
                 const floats    = ['float-tile-1', 'float-tile-2', 'float-tile-3', 'float-tile-4']
                 return (
                   <Link key={tile.label} href={tile.link} className={`${TILE_BASE} ${floats[i] || 'float-tile-1'} ${positions[i] || ''} absolute hover:scale-110 hover:border-[rgba(96,165,250,0.5)] hover:bg-[rgba(96,165,250,0.12)] hover:shadow-[0px_0px_24px_4px_rgba(96,165,250,0.25)] transition-all duration-200 cursor-pointer`}>
-                    {TILE_ICONS[tile.icon] || <span className="text-2xl">{tile.icon}</span>}
+                    {tile.iconImage?.url
+                      ? <Image src={tile.iconImage.url} alt={tile.label} width={36} height={36} className="object-contain" />
+                      : TILE_ICONS[tile.icon] || <span className="text-2xl">{tile.icon}</span>}
                     <span className={TILE_LABEL}>{tile.label}</span>
                   </Link>
                 )
@@ -187,7 +191,9 @@ export default async function Home() {
               <div className="grid grid-cols-2 gap-4">
                 {skillTiles.map((tile, i) => (
                   <Link key={tile.label} href={tile.link} className={`${TILE_BASE} float-tile-${(i % 4) + 1} hover:scale-105 hover:border-[rgba(96,165,250,0.5)] hover:bg-[rgba(96,165,250,0.12)] transition-all duration-200`}>
-                    {TILE_ICONS[tile.icon] || <span className="text-2xl">{tile.icon}</span>}
+                    {tile.iconImage?.url
+                      ? <Image src={tile.iconImage.url} alt={tile.label} width={36} height={36} className="object-contain" />
+                      : TILE_ICONS[tile.icon] || <span className="text-2xl">{tile.icon}</span>}
                     <span className={TILE_LABEL}>{tile.label}</span>
                   </Link>
                 ))}
@@ -207,8 +213,15 @@ export default async function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
             <div className="flex flex-col gap-5">
-              <p className="font-inter text-[18px] text-[#c0c7d1] leading-[1.75]">I&apos;m Sabareesh — a writer, SAP GenAI Developer, growth strategist, and agentic AI practitioner. I sit at the crossroads of enterprise technology and creative storytelling, helping organisations and individuals move faster with intelligence.</p>
-              <p className="font-inter text-[18px] text-[#c0c7d1] leading-[1.75]">From architecting SAP BTP workflows powered by large language models, to writing books and building content engines that scale, I bring a rare blend of left-brain rigour and right-brain creativity to every project I take on.</p>
+              {page?.aboutBio
+                ? <RichText content={page.aboutBio as any} />
+                : (
+                  <>
+                    <p className="font-inter text-[18px] text-[#c0c7d1] leading-[1.75]">I&apos;m Sabareesh — a writer, SAP GenAI Developer, growth strategist, and agentic AI practitioner. I sit at the crossroads of enterprise technology and creative storytelling, helping organisations and individuals move faster with intelligence.</p>
+                    <p className="font-inter text-[18px] text-[#c0c7d1] leading-[1.75]">From architecting SAP BTP workflows powered by large language models, to writing books and building content engines that scale, I bring a rare blend of left-brain rigour and right-brain creativity to every project I take on.</p>
+                  </>
+                )
+              }
             </div>
             <div className="flex flex-col gap-4 justify-center">
               <p className="font-inter font-semibold text-[13px] text-[#64748b] tracking-[1px] uppercase mb-2">Highlights</p>

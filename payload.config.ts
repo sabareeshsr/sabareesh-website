@@ -54,7 +54,16 @@ export default buildConfig({
         defaultColumns: ['filename', 'mimeType', 'filesize'],
         description: 'Images and files uploaded for use across the site.',
       },
-      upload: { staticDir: path.resolve(dirname, 'public/media') },
+      upload: {
+        staticDir: path.resolve(dirname, 'public/media'),
+        imageSizes: [
+          { name: 'thumbnail',    width: 400,  height: 400, position: 'centre' },
+          { name: 'hero',         width: 400,  height: 400, position: 'centre' },
+          { name: 'blogFeatured', width: 1200, height: 630, position: 'centre' },
+          { name: 'bookCover',    width: 400,  height: 600, position: 'centre' },
+          { name: 'tileIcon',     width: 64,   height: 64,  position: 'centre' },
+        ],
+      },
       fields: [{ name: 'alt', type: 'text', label: 'Alt text' }],
     },
 
@@ -133,11 +142,26 @@ export default buildConfig({
           },
           fields: [{ name: 'tag', type: 'text', required: true }],
         },
-        { name: 'featuredImage', type: 'upload', relationTo: 'media' },
+        { name: 'featuredImage', type: 'upload', relationTo: 'media', admin: { description: 'Recommended: 1200×630px landscape. Shown at the top of the post and in social media previews.' } },
         { name: 'excerpt', type: 'textarea', admin: { description: 'Short summary shown on the blog listing card.' } },
         { name: 'metaDescription', type: 'textarea', label: 'Meta Description (SEO)', admin: { description: 'Used for search engine results. Falls back to Excerpt if blank.' } },
         { name: 'content', type: 'richText', editor: lexicalEditor({}) },
       ],
+      hooks: {
+        afterChange: [
+          async ({ doc }: { doc: Record<string, unknown> }) => {
+            if (doc.status === 'published') {
+              const secret = process.env.REVALIDATION_SECRET
+              const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+              if (secret) {
+                try {
+                  await fetch(`${serverUrl}/api/revalidate?secret=${encodeURIComponent(secret)}&path=/blog`)
+                } catch { /* silent — revalidation is best-effort */ }
+              }
+            }
+          },
+        ],
+      },
     },
 
     /* ─── Pages ─── */
@@ -210,7 +234,7 @@ export default buildConfig({
           type: 'upload',
           relationTo: 'media',
           label: 'Profile / Hero Image',
-          admin: { condition: when('home') },
+          admin: { condition: when('home'), description: 'Recommended: 400×400px square. Displays as a circular cropped image in the hero section.' },
         },
         {
           name: 'typewriterWords',
@@ -235,9 +259,10 @@ export default buildConfig({
             components: { RowLabel: rl('label', 'Tile') },
           },
           fields: [
-            { name: 'label', type: 'text', label: 'Label (e.g. "Writer")', required: true },
-            { name: 'icon',  type: 'text', label: 'Icon key: book | circuit | chart | robot (or any emoji)' },
-            { name: 'link',  type: 'text', label: 'Link URL (e.g. /writer)' },
+            { name: 'label',     type: 'text',   label: 'Label (e.g. "Writer")', required: true },
+            { name: 'icon',      type: 'text',   label: 'Icon key or emoji (e.g. book | circuit | chart | robot | ✍️)', admin: { description: 'Used if no icon image is uploaded below.' } },
+            { name: 'iconImage', type: 'upload', relationTo: 'media', label: 'Tile Icon Image (optional)', admin: { description: 'Recommended: 64×64px PNG or SVG. Shown instead of the icon key/emoji above when uploaded.' } },
+            { name: 'link',      type: 'text',   label: 'Link URL (e.g. /writer)' },
           ],
         },
         {
@@ -339,7 +364,7 @@ export default buildConfig({
           type: 'upload',
           relationTo: 'media',
           label: 'Book Cover Image (legacy)',
-          admin: { condition: when('writer') },
+          admin: { condition: when('writer'), description: 'Recommended: 400×600px portrait (2:3 ratio). Use the Books array below for new books.' },
         },
         {
           name: 'amazonLink',
@@ -386,7 +411,7 @@ export default buildConfig({
           fields: [
             { name: 'bookTitle',       type: 'text',     label: 'Book Title', required: true },
             { name: 'bookDescription', type: 'richText', label: 'Book Description', editor: lexicalEditor({}) },
-            { name: 'bookCover',       type: 'upload',   relationTo: 'media', label: 'Book Cover Image' },
+            { name: 'bookCover',       type: 'upload',   relationTo: 'media', label: 'Book Cover Image', admin: { description: 'Recommended: 400×600px portrait (2:3 ratio).' } },
             { name: 'amazonLink',      type: 'text',     label: 'Amazon Buy Link' },
             { name: 'flipkartLink',    type: 'text',     label: 'Flipkart Buy Link' },
             { name: 'otherStoreLink',  type: 'text',     label: 'Other Store Link' },
@@ -426,7 +451,7 @@ export default buildConfig({
             { name: 'title',      type: 'text', required: true },
             { name: 'issuer',     type: 'text' },
             { name: 'date',       type: 'text', label: 'Date (e.g. "2024")' },
-            { name: 'badgeImage', type: 'upload', relationTo: 'media' },
+            { name: 'badgeImage', type: 'upload', relationTo: 'media', admin: { description: 'Recommended: 200×200px square PNG or SVG.' } },
             { name: 'link',       type: 'text', label: 'Certificate URL' },
           ],
         },
@@ -730,15 +755,19 @@ export default buildConfig({
   globals: [
     {
       slug: 'site-settings',
-      label: 'Site Settings',
+      label: 'Site Details',
       admin: {
-        description: 'Global settings — header, footer, SEO, social links.',
+        description: 'Global site configuration, SEO defaults, branding, and social links.',
       },
       fields: [
         /* ── Identity ── */
-        { name: 'siteName',       type: 'text',     label: 'Site / Brand Name (e.g. "Sabareesh")' },
-        { name: 'seoDescription', type: 'textarea', label: 'Default SEO Description (fallback for all pages)' },
-        { name: 'profileImage',   type: 'upload',   relationTo: 'media', label: 'Profile Image (used on home hero)' },
+        { name: 'siteName',        type: 'text',     label: 'Site / Brand Name (e.g. "Sabareesh")' },
+        { name: 'siteTitle',       type: 'text',     label: 'Site Title', admin: { description: 'Appears in the browser tab and search results. e.g. "Sabareesh | Writer & AI Developer"' } },
+        { name: 'siteDescription', type: 'textarea', label: 'Site Description', admin: { description: 'Default meta description for SEO. 150–160 characters recommended.' } },
+        { name: 'seoDescription',  type: 'textarea', label: 'Default SEO Description (legacy fallback)' },
+        { name: 'favicon',         type: 'upload',   relationTo: 'media', label: 'Favicon', admin: { description: 'Recommended: 32×32px or 64×64px. Accepts .ico, .png, or .svg.' } },
+        { name: 'ogImage',         type: 'upload',   relationTo: 'media', label: 'Default OG Image', admin: { description: 'Recommended: 1200×630px. Shown when sharing site links on social media.' } },
+        { name: 'profileImage',    type: 'upload',   relationTo: 'media', label: 'Profile Image (used on home hero)', admin: { description: 'Recommended: 400×400px square. Displays as a circular cropped image.' } },
 
         /* ── Social links ── */
         {

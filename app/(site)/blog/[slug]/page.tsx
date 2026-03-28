@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -50,16 +52,9 @@ async function getRelatedPosts(currentId: string, tags: string[]): Promise<Post[
   } catch { return [] }
 }
 
+// force-dynamic means no static pre-generation; pages render on demand
 export async function generateStaticParams() {
-  try {
-    const payload = await getPayload({ config: configPromise })
-    const { docs } = await payload.find({
-      collection: 'blog-posts',
-      where: { status: { equals: 'published' } },
-      limit: 200, depth: 0,
-    })
-    return docs.map((p: any) => ({ slug: p.slug ?? p.id }))
-  } catch { return [] }
+  return []
 }
 
 export async function generateMetadata(
