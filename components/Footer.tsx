@@ -1,16 +1,21 @@
 import Link from 'next/link'
-import { getSiteSettings } from '@/lib/getSiteSettings'
+import { getFooter } from '@/lib/getFooter'
 
 const DEFAULT_FOOTER_LINKS = [
-  { label: 'Privacy Policy', url: '/privacy',                           external: false },
-  { label: 'LinkedIn',       url: 'https://linkedin.com/in/sabareesh', external: true  },
-  { label: 'GitHub',         url: 'https://github.com/sabareesh',      external: true  },
+  { label: 'Privacy Policy', url: '/privacy',                            openInNewTab: false },
+  { label: 'LinkedIn',       url: 'https://linkedin.com/in/sabareesh',  openInNewTab: true  },
+  { label: 'GitHub',         url: 'https://github.com/sabareesh',       openInNewTab: true  },
 ]
 
+const DEFAULT_COPYRIGHT = `© ${new Date().getFullYear()} SABAREESH. ALL RIGHTS RESERVED.`
+
 export default async function Footer() {
-  const settings    = await getSiteSettings()
-  const siteName    = settings?.siteName || 'Sabareesh'
-  const footerLinks = settings?.footerLinks?.length ? settings.footerLinks : DEFAULT_FOOTER_LINKS
+  const footerData   = await getFooter()
+  const copyright    = footerData?.copyrightText || DEFAULT_COPYRIGHT
+  const footerLinks  = footerData?.footerLinks?.length ? footerData.footerLinks : DEFAULT_FOOTER_LINKS
+
+  // Extract wordmark from copyright (everything before the dot or pipe, fallback to 'SABAREESH')
+  const wordmark = copyright.match(/©\s*\d{4}\s+([^.–—|]+)/)?.[1]?.trim() || 'SABAREESH'
 
   return (
     <footer className="bg-[#0e1322] border-t border-[rgba(255,255,255,0.05)] min-h-[125px]">
@@ -18,21 +23,21 @@ export default async function Footer() {
 
         {/* Left — wordmark */}
         <span className="font-semibold text-[18px] text-white tracking-[0.45px] uppercase font-inter">
-          {siteName}
+          {wordmark}
         </span>
 
         {/* Centre — copyright */}
         <span className="font-medium text-[14px] text-[#64748b] tracking-[0.35px] uppercase font-inter">
-          © {new Date().getFullYear()} {siteName}. All rights reserved.
+          {copyright}
         </span>
 
-        {/* Right — links from CMS */}
+        {/* Right — links */}
         <div className="flex flex-wrap gap-8">
           {footerLinks.map((link) => (
             <Link
               key={link.url}
               href={link.url}
-              {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              {...(link.openInNewTab ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               className="font-medium text-[14px] text-[#64748b] tracking-[0.35px] uppercase hover:text-white transition-colors duration-150 font-inter"
             >
               {link.label}

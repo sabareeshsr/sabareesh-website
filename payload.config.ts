@@ -169,11 +169,21 @@ export default buildConfig({
       slug: 'pages',
       admin: {
         group: 'Content',
-        useAsTitle: 'pageType',
-        defaultColumns: ['pageType', 'heroTitle', 'updatedAt'],
+        useAsTitle: 'pageName',
+        defaultColumns: ['pageName', 'pageType', 'slug', 'updatedAt'],
         description: 'One document per page. Use Page Type to select which page you are editing.',
       },
       fields: [
+        /* ── Identity ── */
+        {
+          name: 'pageName',
+          type: 'text',
+          label: 'Page Name',
+          admin: {
+            description: 'Internal name for this page — e.g. "Writer Page", "SAP Page". Used in the admin list.',
+          },
+        },
+
         /* ── Selector (always visible, sidebar) ── */
         {
           name: 'pageType',
@@ -190,6 +200,32 @@ export default buildConfig({
             { label: '📝 Blog',        value: 'blog' },
             { label: '📬 Contact',     value: 'contact' },
           ],
+        },
+
+        /* ── URL slug (sidebar) ── */
+        {
+          name: 'slug',
+          type: 'text',
+          label: 'Page URL',
+          required: false,
+          unique: true,
+          admin: {
+            description: 'The URL slug for this page. e.g. "writer" → /writer. Lowercase, hyphens only. Auto-generated from Page Name if left blank.',
+            position: 'sidebar',
+          },
+          hooks: {
+            beforeValidate: [
+              ({ value, data }: { value?: string; data?: Record<string, unknown> }) => {
+                if (!value && data?.pageName && typeof data.pageName === 'string') {
+                  return (data.pageName as string)
+                    .toLowerCase()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^a-z0-9-]/g, '')
+                }
+                return value
+              },
+            ],
+          },
         },
 
         /* ═══════════════════════════════════════════
@@ -753,6 +789,106 @@ export default buildConfig({
 
   /* ─── Globals ─── */
   globals: [
+    /* ─── Header ─── */
+    {
+      slug: 'header',
+      label: 'Header',
+      admin: {
+        group: 'Site Global',
+        description: 'Site header — logo text and navigation links.',
+      },
+      fields: [
+        {
+          name: 'logoText',
+          type: 'text',
+          label: 'Logo Text',
+          defaultValue: 'SABAREESH',
+          admin: { description: 'Text shown as the site logo in the top-left corner.' },
+        },
+        {
+          name: 'logoLink',
+          type: 'text',
+          label: 'Logo Link',
+          defaultValue: '/',
+          admin: { description: 'Where clicking the logo navigates to.' },
+        },
+        {
+          name: 'navLinks',
+          type: 'array',
+          label: 'Navigation Links',
+          admin: {
+            description: 'Main nav links shown in the header. Add sub-links to create a dropdown.',
+            initCollapsed: true,
+            components: { RowLabel: rl('label', 'Link') },
+          },
+          fields: [
+            { name: 'label',       type: 'text',     required: true, admin: { description: 'Text shown in the nav — e.g. "Writer"' } },
+            { name: 'url',         type: 'text',     required: true, admin: { description: 'URL path — e.g. "/writer" or full URL for external links' } },
+            { name: 'openInNewTab', type: 'checkbox', defaultValue: false },
+            {
+              name: 'subLinks',
+              type: 'array',
+              label: 'Sub-menu Links (optional)',
+              admin: {
+                description: 'Creates a dropdown under this nav item.',
+                components: { RowLabel: rl('label', 'Sub-link') },
+              },
+              fields: [
+                { name: 'label', type: 'text', required: true },
+                { name: 'url',   type: 'text', required: true },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+
+    /* ─── Footer ─── */
+    {
+      slug: 'footer',
+      label: 'Footer',
+      admin: {
+        group: 'Site Global',
+        description: 'Site footer — copyright text, links, and social URLs.',
+      },
+      fields: [
+        {
+          name: 'copyrightText',
+          type: 'text',
+          label: 'Copyright Text',
+          defaultValue: `© ${new Date().getFullYear()} SABAREESH. ALL RIGHTS RESERVED.`,
+          admin: { description: 'Shown in the footer centre. Year is set here — update annually.' },
+        },
+        {
+          name: 'footerLinks',
+          type: 'array',
+          label: 'Footer Links',
+          admin: {
+            initCollapsed: true,
+            components: { RowLabel: rl('label', 'Link') },
+          },
+          fields: [
+            { name: 'label',        type: 'text',     required: true },
+            { name: 'url',          type: 'text',     required: true },
+            { name: 'openInNewTab', type: 'checkbox', defaultValue: false },
+          ],
+        },
+        {
+          name: 'socialLinks',
+          type: 'group',
+          label: 'Social Links',
+          admin: { description: 'Used in the footer wordmark area.' },
+          fields: [
+            { name: 'linkedin', type: 'text', label: 'LinkedIn URL' },
+            { name: 'twitter',  type: 'text', label: 'Twitter / X URL' },
+            { name: 'github',   type: 'text', label: 'GitHub URL' },
+            { name: 'email',    type: 'text', label: 'Email Address' },
+          ],
+        },
+      ],
+    },
+
+    /* ─── Site Settings ─── */
     {
       slug: 'site-settings',
       label: 'Site Details',
