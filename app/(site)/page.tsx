@@ -6,6 +6,13 @@ import RichText from '@/components/RichText'
 import { getPage } from '@/lib/getPage'
 import { getSiteSettings } from '@/lib/getSiteSettings'
 
+type SkillTile = {
+  label: string
+  icon: string
+  link: string
+  iconImage?: { url?: string } | null
+}
+
 /* ─── Fallbacks ─── */
 const FB = {
   greeting:  "Hi, It's Me",
@@ -27,7 +34,7 @@ const FB = {
     { label: 'SAP Gen AI Dev',   icon: 'circuit', link: '/sap' },
     { label: 'Growth Marketer',  icon: 'chart',   link: '/growth' },
     { label: 'AI Agent Manager', icon: 'robot',   link: '/agentic-ai' },
-  ],
+  ] as SkillTile[],
   ctaButtons: [
     { label: 'View My Work', url: '#about', style: 'primary' },
     { label: 'Get in Touch', url: '/contact', style: 'ghost' },

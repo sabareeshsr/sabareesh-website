@@ -1,5 +1,5 @@
 import RichText from '@/components/RichText'
-import FeatureTilesSection, { type FeatureTilesSectionBlock } from '@/components/sections/FeatureTilesSection'
+import ContentBlocks, { type ContentBlock } from '@/components/sections/ContentBlocks'
 
 export interface StandardTemplateProps {
   heroTitle: string
@@ -9,7 +9,7 @@ export interface StandardTemplateProps {
   body?: object | null
   achievements?: Array<{ label: string; icon?: string }>
   stats?: Array<{ value: string; label?: string }>
-  pageSections?: FeatureTilesSectionBlock[]
+  contentBlocks?: ContentBlock[]
 }
 
 const GLASS = 'backdrop-blur-[16px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-[24px]'
@@ -22,7 +22,7 @@ export default function StandardTemplate({
   body,
   achievements,
   stats,
-  pageSections,
+  contentBlocks,
 }: StandardTemplateProps) {
   return (
     <main className="bg-[#020617] min-h-screen">
@@ -54,22 +54,10 @@ export default function StandardTemplate({
         </div>
       </section>
 
-      {/* ── PAGE SECTIONS (CMS blocks) ── */}
-      {pageSections?.map((section, i) => {
-        if (section.blockType === 'feature-tiles') {
-          return (
-            <FeatureTilesSection
-              key={i}
-              sectionLabel={section.sectionLabel}
-              sectionHeading={section.sectionHeading}
-              tiles={section.tiles || []}
-            />
-          )
-        }
-        return null
-      })}
+      {/* ── CONTENT BLOCKS ── */}
+      <ContentBlocks blocks={contentBlocks} />
 
-      {/* ── BODY CONTENT ── */}
+      {/* ── FIXED ABOUT SECTION (aboutBio field) ── */}
       {(body || aboutTitle) && (
         <section className="relative px-6 pb-20">
           <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[1px]"

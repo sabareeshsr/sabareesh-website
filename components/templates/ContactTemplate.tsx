@@ -1,5 +1,5 @@
 import ContactForm from '@/components/ContactForm'
-import FeatureTilesSection, { type FeatureTilesSectionBlock } from '@/components/sections/FeatureTilesSection'
+import ContentBlocks, { type ContentBlock } from '@/components/sections/ContentBlocks'
 
 export interface ContactTemplateProps {
   heroTitle: string
@@ -11,7 +11,7 @@ export interface ContactTemplateProps {
   availability?: string | null
   formTitle?: string
   subjectOptions?: string[]
-  pageSections?: FeatureTilesSectionBlock[]
+  contentBlocks?: ContentBlock[]
 }
 
 const GLASS = 'backdrop-blur-[16px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-[24px]'
@@ -54,7 +54,7 @@ export default function ContactTemplate({
   availability,
   formTitle,
   subjectOptions,
-  pageSections,
+  contentBlocks,
 }: ContactTemplateProps) {
   const contacts = [
     { icon: <EmailIcon />, label: 'Email', value: email, href: `mailto:${email}`, external: false },
@@ -93,20 +93,8 @@ export default function ContactTemplate({
         </div>
       </section>
 
-      {/* ── PAGE SECTIONS (CMS blocks) ── */}
-      {pageSections?.map((section, i) => {
-        if (section.blockType === 'feature-tiles') {
-          return (
-            <FeatureTilesSection
-              key={i}
-              sectionLabel={section.sectionLabel}
-              sectionHeading={section.sectionHeading}
-              tiles={section.tiles || []}
-            />
-          )
-        }
-        return null
-      })}
+      {/* ── CONTENT BLOCKS ── */}
+      <ContentBlocks blocks={contentBlocks} />
 
       {/* ── SPLIT LAYOUT ── */}
       <section className="px-6 pb-24">
@@ -157,7 +145,7 @@ export default function ContactTemplate({
           {/* ── RIGHT: Contact form ── */}
           <div className={`${GLASS} p-8 md:p-10`}>
             <h2 className="font-plus-jakarta font-bold text-[24px] text-white mb-2">Send a Message</h2>
-            <p className="font-inter text-[15px] text-[#64748b] mb-8">Fill in the details and I'll get back to you shortly.</p>
+            <p className="font-inter text-[15px] text-[#64748b] mb-8">Fill in the details and I&apos;ll get back to you shortly.</p>
             <ContactForm formTitle={formTitle} subjectOptions={subjectOptions} />
           </div>
 

@@ -1,49 +1,18 @@
 import type { Metadata } from 'next'
 import { getPage } from '@/lib/getPage'
-import BookTemplate, { type BookEntry } from '@/components/templates/BookTemplate'
+import BookTemplate from '@/components/templates/BookTemplate'
+import type { ContentBlock } from '@/components/sections/ContentBlocks'
 
 interface WriterPage {
   heroTitle?: string
   heroSubtitle?: string
-  /* legacy single-book fields */
-  bookTitle?: string
-  bookDescription?: object
-  bookCover?: { url?: string; filename?: string; alt?: string } | null
-  amazonLink?: string
-  flipkartLink?: string
-  otherStoreLink?: string
-  writerSections?: Array<{ title?: string; content?: object }>
-  /* new multi-book fields */
-  books?: Array<{
-    bookTitle?: string
-    bookCategory?: string
-    bookDescription?: object
-    bookCover?: { url?: string; filename?: string } | null
-    amazonLink?: string
-    flipkartLink?: string
-    otherStoreLink?: string
-    genres?: Array<{ genre: string }>
-    aboutTheBook?: object
-  }>
-  additionalSections?: Array<{ sectionTitle?: string; sectionContent?: object }>
-  pageSections?: Array<{ blockType: string; sectionLabel?: string; sectionHeading?: string; tiles?: Array<{ icon?: { url?: string } | null; iconEmoji?: string; title: string; description?: string }> }>
+  contentBlocks?: ContentBlock[]
   seo?: { seoTitle?: string; seoDescription?: string; ogImage?: { url?: string } | null }
 }
 
 const FB = {
-  heroTitle:   'Writer',
+  heroTitle:    'Writer',
   heroSubtitle: 'Stories that move people. Books that shape minds.',
-  bookTitle:   'Five Days Forever',
-  bookDesc:    'A coming-of-age story set against the backdrop of modern India — five days that rewrite a lifetime. Part love story, part identity quest, this debut novel explores what happens when ambition and emotion collide.',
-  amazonLink:  '#',
-  flipkartLink: '#',
-}
-
-function mediaUrl(img: { url?: string; filename?: string } | null | undefined): string | null {
-  if (!img) return null
-  if (img.url) return img.url
-  if (img.filename) return `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/api/media/file/${img.filename}`
-  return null
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -64,47 +33,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function WriterPage() {
   const page = await getPage<WriterPage>('writer')
 
-  const heroTitle = page?.heroTitle    || FB.heroTitle
-  const heroSub   = page?.heroSubtitle || FB.heroSubtitle
-
-  const books: BookEntry[] = page?.books?.length
-    ? page.books.map((b) => ({
-        bookTitle:       b.bookTitle,
-        bookCategory:    b.bookCategory,
-        bookDescription: b.bookDescription,
-        coverUrl:        mediaUrl(b.bookCover),
-        amazonLink:      b.amazonLink,
-        flipkartLink:    b.flipkartLink,
-        otherStoreLink:  b.otherStoreLink,
-        genres:          b.genres,
-        aboutTheBook:    b.aboutTheBook,
-      }))
-    : [
-        {
-          bookTitle:       page?.bookTitle    || FB.bookTitle,
-          bookDescription: page?.bookDescription,
-          coverUrl:        mediaUrl(page?.bookCover ?? null),
-          amazonLink:      page?.amazonLink   || FB.amazonLink,
-          flipkartLink:    page?.flipkartLink || FB.flipkartLink,
-          otherStoreLink:  page?.otherStoreLink,
-          fallbackDesc:    FB.bookDesc,
-        },
-      ]
-
-  const sections = page?.additionalSections?.length
-    ? page.additionalSections.map((s) => ({ title: s.sectionTitle, content: s.sectionContent }))
-    : page?.writerSections?.length
-    ? page.writerSections.map((s) => ({ title: s.title, content: s.content }))
-    : null
-
   return (
     <BookTemplate
-      heroTitle={heroTitle}
-      heroSubtitle={heroSub}
-      books={books}
-      sections={sections}
-      pageSections={page?.pageSections as any}
+      heroTitle={page?.heroTitle || FB.heroTitle}
+      heroSubtitle={page?.heroSubtitle || FB.heroSubtitle}
       badge="Creative Writing"
+      contentBlocks={page?.contentBlocks as ContentBlock[] | undefined}
     />
   )
 }

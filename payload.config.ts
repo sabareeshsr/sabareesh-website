@@ -1,5 +1,5 @@
 import path from 'path'
-import { buildConfig } from 'payload'
+import { buildConfig, type Block } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import sharp from 'sharp'
@@ -35,10 +35,9 @@ function rl(
 }
 
 /* ─── Reusable block: Feature Tiles Section ─── */
-const FeatureTilesBlock = {
+const FeatureTilesBlock: Block = {
   slug: 'feature-tiles',
   labels: { singular: 'Feature Tiles Section', plural: 'Feature Tiles Sections' },
-  admin: { description: 'A section with a heading and glassmorphism feature cards. Drag to reorder.' },
   fields: [
     {
       name: 'sectionLabel',
@@ -81,7 +80,193 @@ const FeatureTilesBlock = {
       ],
     },
   ],
-} as const
+}
+
+/* ─── Block: Book Showcase ─── */
+const BookShowcaseBlock: Block = {
+  slug: 'book-showcase',
+  labels: { singular: 'Book Showcase', plural: 'Book Showcases' },
+  fields: [
+    { name: 'bookTitle',    type: 'text',     label: 'Book Title',       admin: { description: 'e.g. "Five Days Forever"' } },
+    { name: 'bookCover',    type: 'upload',   relationTo: 'media', label: 'Book Cover', admin: { description: 'Recommended: 400×600px portrait (2:3 ratio).' } },
+    { name: 'bookCategory', type: 'text',     label: 'Category Label',   admin: { description: 'Shown above title in caps. e.g. "DEBUT NOVEL · FICTION"' } },
+    { name: 'bookDescription', type: 'richText', label: 'Book Description', editor: lexicalEditor({}) },
+    {
+      name: 'genres',
+      type: 'array',
+      label: 'Genre Tags',
+      admin: {
+        description: 'Tags shown below the title. e.g. Literary Fiction, Coming of Age',
+        components: { RowLabel: rl('genre', 'Genre') },
+      },
+      fields: [{ name: 'genre', type: 'text', required: true }],
+    },
+    { name: 'amazonLink',    type: 'text', label: 'Amazon Buy Link' },
+    { name: 'flipkartLink',  type: 'text', label: 'Flipkart Buy Link' },
+    { name: 'otherStoreLink', type: 'text', label: 'Other Store Link' },
+    { name: 'aboutTitle',   type: 'text',     label: 'About Section Heading', admin: { description: 'e.g. "About the Book"' } },
+    { name: 'aboutContent', type: 'richText', label: 'About Section Content', editor: lexicalEditor({}) },
+  ],
+}
+
+/* ─── Block: Rich Text Section ─── */
+const RichTextBlock: Block = {
+  slug: 'rich-text',
+  labels: { singular: 'Text Section', plural: 'Text Sections' },
+  fields: [
+    { name: 'sectionLabel',   type: 'text',     label: 'Section Label',   admin: { description: 'Small caps tag. e.g. "ABOUT"' } },
+    { name: 'sectionHeading', type: 'text',     label: 'Section Heading' },
+    { name: 'content',        type: 'richText', label: 'Content', editor: lexicalEditor({}) },
+  ],
+}
+
+/* ─── Block: Experience / Timeline ─── */
+const ExperienceBlock: Block = {
+  slug: 'experience',
+  labels: { singular: 'Experience / Timeline', plural: 'Experience Sections' },
+  fields: [
+    { name: 'sectionLabel',   type: 'text', label: 'Section Label',   admin: { description: 'e.g. "CAREER"' } },
+    { name: 'sectionHeading', type: 'text', label: 'Section Heading', admin: { description: 'e.g. "Work Experience"' } },
+    {
+      name: 'experiences',
+      type: 'array',
+      label: 'Experiences',
+      admin: { components: { RowLabel: rl('company', 'Experience', 'role') } },
+      fields: [
+        { name: 'company',     type: 'text', required: true },
+        { name: 'role',        type: 'text' },
+        { name: 'duration',    type: 'text',     label: 'Duration (e.g. "2022 – Present")' },
+        { name: 'description', type: 'richText', label: 'Description', editor: lexicalEditor({}) },
+        { name: 'logo',        type: 'upload',   relationTo: 'media', label: 'Company Logo', admin: { description: 'Recommended: 200×200px square.' } },
+      ],
+    },
+  ],
+}
+
+/* ─── Block: Skills Grid ─── */
+const SkillsGridBlock: Block = {
+  slug: 'skills-grid',
+  labels: { singular: 'Skills Grid', plural: 'Skills Grids' },
+  fields: [
+    { name: 'sectionLabel',   type: 'text', label: 'Section Label' },
+    { name: 'sectionHeading', type: 'text', label: 'Section Heading' },
+    {
+      name: 'skills',
+      type: 'array',
+      label: 'Skill Groups',
+      admin: { components: { RowLabel: rl('category', 'Skill Group') } },
+      fields: [
+        { name: 'category', type: 'text', required: true, label: 'Category Name' },
+        {
+          name: 'items',
+          type: 'array',
+          label: 'Skill Items',
+          admin: { components: { RowLabel: rl('item', 'Item') } },
+          fields: [{ name: 'item', type: 'text', required: true }],
+        },
+      ],
+    },
+  ],
+}
+
+/* ─── Block: Certifications ─── */
+const CertificationsBlock: Block = {
+  slug: 'certifications',
+  labels: { singular: 'Certifications', plural: 'Certifications Sections' },
+  fields: [
+    { name: 'sectionLabel',   type: 'text', label: 'Section Label' },
+    { name: 'sectionHeading', type: 'text', label: 'Section Heading' },
+    {
+      name: 'certifications',
+      type: 'array',
+      label: 'Certifications',
+      admin: { components: { RowLabel: rl('title', 'Certification') } },
+      fields: [
+        { name: 'title',      type: 'text',   required: true },
+        { name: 'issuer',     type: 'text' },
+        { name: 'date',       type: 'text',   label: 'Date (e.g. "2024")' },
+        { name: 'badgeImage', type: 'upload', relationTo: 'media', admin: { description: 'Recommended: 200×200px square.' } },
+        { name: 'link',       type: 'text',   label: 'Certificate URL' },
+      ],
+    },
+  ],
+}
+
+/* ─── Block: Projects Grid ─── */
+const ProjectsGridBlock: Block = {
+  slug: 'projects-grid',
+  labels: { singular: 'Projects Grid', plural: 'Projects Grids' },
+  fields: [
+    { name: 'sectionLabel',   type: 'text', label: 'Section Label' },
+    { name: 'sectionHeading', type: 'text', label: 'Section Heading' },
+    {
+      name: 'projects',
+      type: 'array',
+      label: 'Projects',
+      admin: { components: { RowLabel: rl('title', 'Project') } },
+      fields: [
+        { name: 'title',       type: 'text',     required: true },
+        { name: 'description', type: 'textarea' },
+        {
+          name: 'tags',
+          type: 'array',
+          label: 'Tags',
+          admin: { components: { RowLabel: rl('tag', 'Tag') } },
+          fields: [{ name: 'tag', type: 'text', required: true }],
+        },
+        { name: 'link',  type: 'text',   label: 'Project URL' },
+        { name: 'image', type: 'upload', relationTo: 'media', label: 'Project Image' },
+      ],
+    },
+  ],
+}
+
+/* ─── Block: Stats / Numbers ─── */
+const StatsBlock: Block = {
+  slug: 'stats',
+  labels: { singular: 'Stats / Numbers', plural: 'Stats Sections' },
+  fields: [
+    { name: 'sectionLabel', type: 'text', label: 'Section Label' },
+    {
+      name: 'stats',
+      type: 'array',
+      label: 'Stats',
+      admin: { components: { RowLabel: rl('label', 'Stat', 'value', ' ') } },
+      fields: [
+        { name: 'value', type: 'text', required: true, label: 'Value (e.g. "50+")' },
+        { name: 'label', type: 'text', label: 'Label (e.g. "Projects")' },
+      ],
+    },
+  ],
+}
+
+/* ─── Block: Call to Action ─── */
+const CTABlock: Block = {
+  slug: 'cta',
+  labels: { singular: 'Call to Action', plural: 'Call to Action Sections' },
+  fields: [
+    { name: 'heading', type: 'text', label: 'Heading' },
+    { name: 'subtext', type: 'text', label: 'Subtext' },
+    {
+      name: 'buttons',
+      type: 'array',
+      label: 'Buttons',
+      admin: { components: { RowLabel: rl('label', 'Button') } },
+      fields: [
+        { name: 'label', type: 'text', required: true },
+        { name: 'url',   type: 'text', label: 'URL' },
+        {
+          name: 'style',
+          type: 'select',
+          options: [
+            { label: 'Primary (solid blue)', value: 'primary' },
+            { label: 'Ghost (outlined)',      value: 'ghost'   },
+          ],
+        },
+      ],
+    },
+  ],
+}
 
 export default buildConfig({
   admin: { user: 'users' },
@@ -294,14 +479,33 @@ export default buildConfig({
           label: 'Page Subheading',
         },
 
-        /* ── Page Sections (blocks) — always visible, applies to all templates ── */
+        /* ── Page Sections (legacy — replaced by contentBlocks) ── */
         {
           name: 'pageSections',
           type: 'blocks',
-          label: 'Page Sections',
+          label: 'Page Sections (legacy)',
           blocks: [FeatureTilesBlock],
+          admin: { condition: () => false },
+        },
+
+        /* ── Content Blocks — drag-and-drop page builder ── */
+        {
+          name: 'contentBlocks',
+          type: 'blocks',
+          label: 'Page Content',
+          blocks: [
+            FeatureTilesBlock,
+            BookShowcaseBlock,
+            RichTextBlock,
+            ExperienceBlock,
+            SkillsGridBlock,
+            CertificationsBlock,
+            ProjectsGridBlock,
+            StatsBlock,
+            CTABlock,
+          ],
           admin: {
-            description: 'Add and reorder content sections for this page. Drag to reorder.',
+            description: 'Build your page by adding and reordering content blocks. Every block is draggable.',
             initCollapsed: true,
           },
         },
@@ -499,9 +703,9 @@ export default buildConfig({
         {
           name: 'books',
           type: 'array',
-          label: 'Books',
+          label: 'Books (legacy — use Content Blocks)',
           admin: {
-            condition: when('book'),
+            condition: () => false,
             description: 'Add one entry per book. Each renders as its own showcase section on the page.',
             initCollapsed: false,
             components: { RowLabel: rl('bookTitle', 'Book') },
@@ -532,9 +736,9 @@ export default buildConfig({
         {
           name: 'additionalSections',
           type: 'array',
-          label: 'Additional Sections',
+          label: 'Additional Sections (legacy)',
           admin: {
-            condition: when('book', 'standard'),
+            condition: () => false,
             description: 'Extra content sections rendered below the main content.',
             initCollapsed: true,
             components: { RowLabel: rl('sectionTitle', 'Section') },
@@ -551,10 +755,9 @@ export default buildConfig({
         {
           name: 'certifications',
           type: 'array',
-          label: 'Certifications',
+          label: 'Certifications (legacy)',
           admin: {
-            condition: when('expertise'),
-            description: 'SAP certifications displayed as badge cards.',
+            condition: () => false,
             initCollapsed: true,
             components: { RowLabel: rl('title', 'Certification') },
           },
@@ -569,9 +772,9 @@ export default buildConfig({
         {
           name: 'communityBlogs',
           type: 'array',
-          label: 'SAP Community Blog Posts',
+          label: 'SAP Community Blog Posts (legacy)',
           admin: {
-            condition: when('expertise'),
+            condition: () => false,
             description: 'Blog posts published on SAP Community or other platforms.',
             initCollapsed: true,
             components: { RowLabel: rl('title', 'Blog Post') },
@@ -596,22 +799,22 @@ export default buildConfig({
         {
           name: 'approachTitle',
           type: 'text',
-          label: 'Approach Section Title',
-          admin: { condition: when('expertise') },
+          label: 'Approach Section Title (legacy)',
+          admin: { condition: () => false },
         },
         {
           name: 'approachContent',
           type: 'richText',
-          label: 'Approach Content',
+          label: 'Approach Content (legacy)',
           editor: lexicalEditor({}),
-          admin: { condition: when('expertise') },
+          admin: { condition: () => false },
         },
         {
           name: 'sapSections',
           type: 'array',
-          label: 'Approach Cards',
+          label: 'Approach Cards (legacy)',
           admin: {
-            condition: when('expertise'),
+            condition: () => false,
             description: 'Cards describing the SAP methodology.',
             initCollapsed: true,
             components: { RowLabel: rl('title', 'Card') },
@@ -629,9 +832,9 @@ export default buildConfig({
         {
           name: 'experiences',
           type: 'array',
-          label: 'Work Experiences',
+          label: 'Work Experiences (legacy)',
           admin: {
-            condition: when('expertise'),
+            condition: () => false,
             description: 'Each experience renders as a card with role, duration, and highlights.',
             initCollapsed: true,
             components: { RowLabel: rl('company', 'Experience', 'role') },
@@ -656,9 +859,9 @@ export default buildConfig({
         {
           name: 'skills',
           type: 'array',
-          label: 'Skill Cards',
+          label: 'Skill Cards (legacy)',
           admin: {
-            condition: when('expertise'),
+            condition: () => false,
             description: 'Marketing skill areas shown as cards on the Growth page.',
             initCollapsed: true,
             components: { RowLabel: rl('category', 'Skill') },
@@ -672,9 +875,9 @@ export default buildConfig({
         {
           name: 'growthStats',
           type: 'array',
-          label: 'Stats / Highlights',
+          label: 'Stats / Highlights (legacy)',
           admin: {
-            condition: when('expertise'),
+            condition: () => false,
             description: 'Key metrics displayed as a stat row.',
             initCollapsed: true,
             components: { RowLabel: rl('metric', 'Stat', 'label', ' ') },
@@ -691,9 +894,9 @@ export default buildConfig({
         {
           name: 'expertise',
           type: 'array',
-          label: 'Expertise Cards',
+          label: 'Expertise Cards (legacy)',
           admin: {
-            condition: when('expertise'),
+            condition: () => false,
             description: 'Core capability cards (RAG Systems, Vibe Coding, etc.).',
             initCollapsed: true,
             components: { RowLabel: rl('title', 'Expertise') },
@@ -707,9 +910,9 @@ export default buildConfig({
         {
           name: 'aiProjects',
           type: 'array',
-          label: 'AI Projects',
+          label: 'AI Projects (legacy)',
           admin: {
-            condition: when('expertise'),
+            condition: () => false,
             description: 'Showcase projects with title, status (Live/Beta/WIP), and optional link.',
             initCollapsed: true,
             components: { RowLabel: rl('title', 'Project', 'status') },
@@ -738,9 +941,9 @@ export default buildConfig({
         {
           name: 'services',
           type: 'array',
-          label: 'Services Offered',
+          label: 'Services Offered (legacy)',
           admin: {
-            condition: when('expertise'),
+            condition: () => false,
             initCollapsed: true,
             components: { RowLabel: rl('title', 'Service') },
           },
@@ -752,9 +955,9 @@ export default buildConfig({
         {
           name: 'toolStack',
           type: 'array',
-          label: 'Tool Stack (chips)',
+          label: 'Tool Stack (legacy)',
           admin: {
-            condition: when('expertise'),
+            condition: () => false,
             description: 'Tools and technologies displayed as chips below the projects.',
             initCollapsed: true,
             components: { RowLabel: rl('tool', 'Tool') },
@@ -1049,7 +1252,6 @@ export default buildConfig({
       max: 3,
     },
     migrationDir: './migrations',
-    prodMigrations: true,
   }),
   sharp,
 })

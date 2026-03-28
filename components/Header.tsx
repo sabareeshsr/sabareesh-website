@@ -2,7 +2,14 @@ import Link from 'next/link'
 import { getHeader } from '@/lib/getHeader'
 import MobileMenu from './MobileMenu'
 
-const DEFAULT_NAV = [
+type NavLink = {
+  label: string
+  url: string
+  openInNewTab?: boolean
+  subLinks?: Array<{ label: string; url: string }>
+}
+
+const DEFAULT_NAV: NavLink[] = [
   { label: 'Writer',          url: '/writer' },
   { label: 'Growth Marketer', url: '/growth' },
   { label: 'SAP',             url: '/sap' },
