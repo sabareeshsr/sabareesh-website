@@ -25,11 +25,13 @@ interface PageDoc {
   /* book */
   books?: Array<{
     bookTitle?: string
+    bookCategory?: string
     bookDescription?: object
     bookCover?: { url?: string; filename?: string } | null
     amazonLink?: string
     flipkartLink?: string
     otherStoreLink?: string
+    genres?: Array<{ genre: string }>
     aboutTheBook?: object
   }>
   additionalSections?: Array<{ sectionTitle?: string; sectionContent?: object }>
@@ -51,6 +53,7 @@ interface PageDoc {
   formTitle?: string
   subjectOptions?: Array<{ subject: string }>
   /* seo */
+  pageSections?: Array<{ blockType: string; sectionLabel?: string; sectionHeading?: string; tiles?: Array<{ icon?: { url?: string } | null; iconEmoji?: string; title: string; description?: string }> }>
   seo?: { seoTitle?: string; seoDescription?: string; ogImage?: { url?: string } | null }
 }
 
@@ -94,11 +97,13 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
     const books: BookEntry[] = page.books?.length
       ? page.books.map((b) => ({
           bookTitle:       b.bookTitle,
+          bookCategory:    b.bookCategory,
           bookDescription: b.bookDescription,
           coverUrl:        resolveMediaUrl(b.bookCover),
           amazonLink:      b.amazonLink,
           flipkartLink:    b.flipkartLink,
           otherStoreLink:  b.otherStoreLink,
+          genres:          b.genres,
           aboutTheBook:    b.aboutTheBook,
         }))
       : [{ bookTitle: heroTitle, fallbackDesc: heroSubtitle }]
@@ -107,7 +112,7 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
       ? page.additionalSections.map((s) => ({ title: s.sectionTitle, content: s.sectionContent }))
       : null
 
-    return <BookTemplate heroTitle={heroTitle} heroSubtitle={heroSubtitle || ''} books={books} sections={sections} />
+    return <BookTemplate heroTitle={heroTitle} heroSubtitle={heroSubtitle || ''} books={books} sections={sections} pageSections={page.pageSections as any} />
   }
 
   /* ── EXPERTISE template ── */
@@ -120,6 +125,7 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
         projects={page.aiProjects}
         services={page.services}
         toolStack={page.toolStack}
+        pageSections={page.pageSections as any}
       />
     )
   }
@@ -137,6 +143,7 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
         availability={page.availability || null}
         formTitle={page.formTitle}
         subjectOptions={page.subjectOptions?.map((o) => o.subject).filter(Boolean)}
+        pageSections={page.pageSections as any}
       />
     )
   }
@@ -152,6 +159,7 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
         body={page.aboutBio || null}
         achievements={page.achievements}
         stats={page.stats}
+        pageSections={page.pageSections as any}
       />
     )
   }
@@ -166,6 +174,7 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
       body={page.aboutBio || null}
       achievements={page.achievements}
       stats={page.stats}
+      pageSections={page.pageSections as any}
     />
   )
 }

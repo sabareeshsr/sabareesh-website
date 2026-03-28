@@ -34,6 +34,55 @@ function rl(
   }
 }
 
+/* ─── Reusable block: Feature Tiles Section ─── */
+const FeatureTilesBlock = {
+  slug: 'feature-tiles',
+  labels: { singular: 'Feature Tiles Section', plural: 'Feature Tiles Sections' },
+  admin: { description: 'A section with a heading and glassmorphism feature cards. Drag to reorder.' },
+  fields: [
+    {
+      name: 'sectionLabel',
+      type: 'text',
+      label: 'Section Label',
+      admin: { description: 'Small caps tag above the heading. e.g. "ABOUT THE BOOK" or "WHAT I OFFER"' },
+    },
+    {
+      name: 'sectionHeading',
+      type: 'text',
+      label: 'Section Heading',
+      admin: { description: 'Main heading. e.g. "What makes it special"' },
+    },
+    {
+      name: 'tiles',
+      type: 'array',
+      label: 'Feature Tiles',
+      minRows: 1,
+      maxRows: 6,
+      admin: {
+        description: 'Add up to 6 tiles. Drag to reorder.',
+        components: { RowLabel: rl('title', 'Tile') },
+      },
+      fields: [
+        {
+          name: 'icon',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Icon Image',
+          admin: { description: 'Recommended: 64×64px PNG, SVG, or WebP icon.' },
+        },
+        {
+          name: 'iconEmoji',
+          type: 'text',
+          label: 'Emoji Icon (if no image)',
+          admin: { description: 'Alternative to image. Type an emoji e.g. 🎭 🌍 💡' },
+        },
+        { name: 'title',       type: 'text',     required: true, label: 'Tile Title',       admin: { description: 'e.g. "Authentic Voice"' } },
+        { name: 'description', type: 'textarea', label: 'Tile Description', admin: { description: 'Short description shown below the title.' } },
+      ],
+    },
+  ],
+} as const
+
 export default buildConfig({
   admin: { user: 'users' },
 
@@ -245,6 +294,18 @@ export default buildConfig({
           label: 'Page Subheading',
         },
 
+        /* ── Page Sections (blocks) — always visible, applies to all templates ── */
+        {
+          name: 'pageSections',
+          type: 'blocks',
+          label: 'Page Sections',
+          blocks: [FeatureTilesBlock],
+          admin: {
+            description: 'Add and reorder content sections for this page. Drag to reorder.',
+            initCollapsed: true,
+          },
+        },
+
         /* ═══════════════════════════════════════════
            HOME PAGE
         ═══════════════════════════════════════════ */
@@ -447,11 +508,24 @@ export default buildConfig({
           },
           fields: [
             { name: 'bookTitle',       type: 'text',     label: 'Book Title', required: true },
+            { name: 'bookCategory',    type: 'text',     label: 'Book Category Label', admin: { description: 'Shown above the title in caps. e.g. "DEBUT NOVEL · FICTION"' } },
             { name: 'bookDescription', type: 'richText', label: 'Book Description', editor: lexicalEditor({}) },
             { name: 'bookCover',       type: 'upload',   relationTo: 'media', label: 'Book Cover Image', admin: { description: 'Recommended: 400×600px portrait (2:3 ratio).' } },
             { name: 'amazonLink',      type: 'text',     label: 'Amazon Buy Link' },
             { name: 'flipkartLink',    type: 'text',     label: 'Flipkart Buy Link' },
             { name: 'otherStoreLink',  type: 'text',     label: 'Other Store Link' },
+            {
+              name: 'genres',
+              type: 'array',
+              label: 'Genre Tags',
+              admin: {
+                description: 'Tags shown below the book title. e.g. Literary Fiction, Coming of Age, Indian Author',
+                components: { RowLabel: rl('genre', 'Tag') },
+              },
+              fields: [
+                { name: 'genre', type: 'text', required: true, admin: { description: 'e.g. Literary Fiction' } },
+              ],
+            },
             { name: 'aboutTheBook',    type: 'richText', label: 'About the Book', editor: lexicalEditor({}) },
           ],
         },

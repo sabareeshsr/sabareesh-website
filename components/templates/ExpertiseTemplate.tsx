@@ -13,6 +13,8 @@ export interface Project {
   link?: string
 }
 
+import FeatureTilesSection, { type FeatureTilesSectionBlock } from '@/components/sections/FeatureTilesSection'
+
 export interface ExpertiseTemplateProps {
   heroTitle: string
   heroSubtitle?: string
@@ -21,6 +23,7 @@ export interface ExpertiseTemplateProps {
   projects?: Project[]
   services?: ExpertiseCard[]
   toolStack?: Array<{ tool: string }>
+  pageSections?: FeatureTilesSectionBlock[]
 }
 
 const GLASS = 'backdrop-blur-[16px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-[24px]'
@@ -39,6 +42,7 @@ export default function ExpertiseTemplate({
   projects,
   services,
   toolStack,
+  pageSections,
 }: ExpertiseTemplateProps) {
   return (
     <main className="bg-[#020617] min-h-screen">
@@ -69,6 +73,21 @@ export default function ExpertiseTemplate({
           </div>
         </div>
       </section>
+
+      {/* ── PAGE SECTIONS (CMS blocks) ── */}
+      {pageSections?.map((section, i) => {
+        if (section.blockType === 'feature-tiles') {
+          return (
+            <FeatureTilesSection
+              key={i}
+              sectionLabel={section.sectionLabel}
+              sectionHeading={section.sectionHeading}
+              tiles={section.tiles || []}
+            />
+          )
+        }
+        return null
+      })}
 
       {/* ── EXPERTISE CARDS ── */}
       {expertiseCards?.length ? (

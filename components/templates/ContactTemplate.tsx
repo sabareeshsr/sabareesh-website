@@ -1,4 +1,5 @@
 import ContactForm from '@/components/ContactForm'
+import FeatureTilesSection, { type FeatureTilesSectionBlock } from '@/components/sections/FeatureTilesSection'
 
 export interface ContactTemplateProps {
   heroTitle: string
@@ -10,6 +11,7 @@ export interface ContactTemplateProps {
   availability?: string | null
   formTitle?: string
   subjectOptions?: string[]
+  pageSections?: FeatureTilesSectionBlock[]
 }
 
 const GLASS = 'backdrop-blur-[16px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-[24px]'
@@ -52,6 +54,7 @@ export default function ContactTemplate({
   availability,
   formTitle,
   subjectOptions,
+  pageSections,
 }: ContactTemplateProps) {
   const contacts = [
     { icon: <EmailIcon />, label: 'Email', value: email, href: `mailto:${email}`, external: false },
@@ -89,6 +92,21 @@ export default function ContactTemplate({
           </div>
         </div>
       </section>
+
+      {/* ── PAGE SECTIONS (CMS blocks) ── */}
+      {pageSections?.map((section, i) => {
+        if (section.blockType === 'feature-tiles') {
+          return (
+            <FeatureTilesSection
+              key={i}
+              sectionLabel={section.sectionLabel}
+              sectionHeading={section.sectionHeading}
+              tiles={section.tiles || []}
+            />
+          )
+        }
+        return null
+      })}
 
       {/* ── SPLIT LAYOUT ── */}
       <section className="px-6 pb-24">

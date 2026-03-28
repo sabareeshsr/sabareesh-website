@@ -1,4 +1,5 @@
 import RichText from '@/components/RichText'
+import FeatureTilesSection, { type FeatureTilesSectionBlock } from '@/components/sections/FeatureTilesSection'
 
 export interface StandardTemplateProps {
   heroTitle: string
@@ -8,6 +9,7 @@ export interface StandardTemplateProps {
   body?: object | null
   achievements?: Array<{ label: string; icon?: string }>
   stats?: Array<{ value: string; label?: string }>
+  pageSections?: FeatureTilesSectionBlock[]
 }
 
 const GLASS = 'backdrop-blur-[16px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-[24px]'
@@ -20,6 +22,7 @@ export default function StandardTemplate({
   body,
   achievements,
   stats,
+  pageSections,
 }: StandardTemplateProps) {
   return (
     <main className="bg-[#020617] min-h-screen">
@@ -50,6 +53,21 @@ export default function StandardTemplate({
           </div>
         </div>
       </section>
+
+      {/* ── PAGE SECTIONS (CMS blocks) ── */}
+      {pageSections?.map((section, i) => {
+        if (section.blockType === 'feature-tiles') {
+          return (
+            <FeatureTilesSection
+              key={i}
+              sectionLabel={section.sectionLabel}
+              sectionHeading={section.sectionHeading}
+              tiles={section.tiles || []}
+            />
+          )
+        }
+        return null
+      })}
 
       {/* ── BODY CONTENT ── */}
       {(body || aboutTitle) && (

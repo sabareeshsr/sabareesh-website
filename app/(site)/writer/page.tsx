@@ -16,14 +16,17 @@ interface WriterPage {
   /* new multi-book fields */
   books?: Array<{
     bookTitle?: string
+    bookCategory?: string
     bookDescription?: object
     bookCover?: { url?: string; filename?: string } | null
     amazonLink?: string
     flipkartLink?: string
     otherStoreLink?: string
+    genres?: Array<{ genre: string }>
     aboutTheBook?: object
   }>
   additionalSections?: Array<{ sectionTitle?: string; sectionContent?: object }>
+  pageSections?: Array<{ blockType: string; sectionLabel?: string; sectionHeading?: string; tiles?: Array<{ icon?: { url?: string } | null; iconEmoji?: string; title: string; description?: string }> }>
   seo?: { seoTitle?: string; seoDescription?: string; ogImage?: { url?: string } | null }
 }
 
@@ -67,11 +70,13 @@ export default async function WriterPage() {
   const books: BookEntry[] = page?.books?.length
     ? page.books.map((b) => ({
         bookTitle:       b.bookTitle,
+        bookCategory:    b.bookCategory,
         bookDescription: b.bookDescription,
         coverUrl:        mediaUrl(b.bookCover),
         amazonLink:      b.amazonLink,
         flipkartLink:    b.flipkartLink,
         otherStoreLink:  b.otherStoreLink,
+        genres:          b.genres,
         aboutTheBook:    b.aboutTheBook,
       }))
     : [
@@ -98,6 +103,7 @@ export default async function WriterPage() {
       heroSubtitle={heroSub}
       books={books}
       sections={sections}
+      pageSections={page?.pageSections as any}
       badge="Creative Writing"
     />
   )
