@@ -140,7 +140,7 @@ export default buildConfig({
             initCollapsed: true,
             components: { RowLabel: rl('tag', 'Tag') },
           },
-          fields: [{ name: 'tag', type: 'text', required: true }],
+          fields: [{ name: 'tag', type: 'text', required: false }],
         },
         { name: 'featuredImage', type: 'upload', relationTo: 'media', admin: { description: 'Recommended: 1200×630px landscape. Shown at the top of the post and in social media previews.' } },
         { name: 'excerpt', type: 'textarea', admin: { description: 'Short summary shown on the blog listing card.' } },
@@ -832,7 +832,14 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   db: postgresAdapter({
-    pool: { connectionString: process.env.DATABASE_URI || '' },
+    pool: {
+      connectionString: process.env.DATABASE_URI || '',
+      connectionTimeoutMillis: 5000,
+      idleTimeoutMillis: 10000,
+      max: 3,
+    },
+    migrationDir: './migrations',
+    prodMigrations: true,
   }),
   sharp,
 })
