@@ -53,7 +53,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${plusJakartaSans.variable} bg-[#020617] min-h-screen flex flex-col`}>
+      <body className={`${inter.variable} ${plusJakartaSans.variable} bg-[#020617] min-h-screen flex flex-col overflow-x-hidden`}>
         <Header />
         <div className="flex-1">{children}</div>
         <Footer />

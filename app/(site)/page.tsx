@@ -45,7 +45,7 @@ const FB = {
 }
 
 /* ─── Design tokens ─── */
-const TILE_BASE = 'backdrop-blur-[8px] bg-[rgba(26,31,47,0.6)] border border-[rgba(222,225,247,0.2)] rounded-[24px] flex flex-col items-center justify-center gap-[6px] w-[160px] h-[80px]'
+const TILE_BASE = 'backdrop-blur-[8px] bg-[rgba(26,31,47,0.6)] border border-[rgba(222,225,247,0.2)] rounded-[24px] flex flex-col items-center justify-center gap-[6px] w-[120px] sm:w-[140px] lg:w-[160px] h-[72px] sm:h-[80px]'
 const TILE_LABEL = 'font-inter font-medium text-[10px] text-[#c0c7d1] tracking-[0.3px] uppercase text-center leading-tight px-2'
 
 /* ─── Inline icons ─── */
@@ -147,21 +147,21 @@ export default async function Home() {
   return (
     <>
       {/* ══ HERO ══ */}
-      <section className="relative min-h-[calc(100vh-65px)] flex items-center overflow-hidden bg-[#020617]">
+      <section className="relative min-h-[calc(100vh-65px)] flex items-center overflow-x-hidden bg-[#020617]">
         <div className="pointer-events-none absolute inset-0 mesh-pulse" style={{ background: ['radial-gradient(ellipse 55% 65% at 78% 50%, rgba(74,159,224,0.18) 0%, transparent 70%)', 'radial-gradient(ellipse 30% 40% at 75% 48%, rgba(96,165,250,0.10) 0%, transparent 55%)', 'radial-gradient(ellipse 20% 25% at 20% 80%, rgba(37,99,235,0.07) 0%, transparent 60%)'].join(', ') }} />
         <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(148,204,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(148,204,255,1) 1px, transparent 1px)', backgroundSize: '80px 80px' }} />
 
-        <div className="relative z-10 w-full max-w-[1280px] mx-auto px-6 lg:px-12 py-16 flex flex-col lg:flex-row items-center gap-16 lg:gap-0">
+        <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-12 py-12 sm:py-16 flex flex-col-reverse lg:flex-row items-center gap-10 lg:gap-0">
 
           {/* LEFT */}
-          <div className="flex-1 flex flex-col items-start gap-6 lg:pr-8">
+          <div className="w-full lg:flex-1 flex flex-col items-center lg:items-start text-center lg:text-left gap-6 lg:pr-8">
             <span className="font-inter font-medium text-[14px] text-[#64748b] tracking-[0.5px]">{greeting}</span>
-            <h1 className="font-plus-jakarta font-extrabold text-[56px] md:text-[68px] lg:text-[76px] leading-none tracking-[-2px]">
+            <h1 className="font-plus-jakarta font-extrabold text-[36px] sm:text-[48px] md:text-[60px] lg:text-[76px] leading-none tracking-[-1px] lg:tracking-[-2px] break-words w-full">
               <span className="bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' }}>{name}</span>
             </h1>
             <div className="h-[44px] flex items-center"><Typewriter words={typewriterWords} /></div>
-            <p className="font-inter text-[17px] text-[#94a3b8] leading-[1.75] max-w-[480px]">{bio}</p>
-            <div className="flex flex-wrap items-center gap-4 mt-2">
+            <p className="font-inter text-[17px] text-[#94a3b8] leading-[1.75] max-w-[480px] mx-auto lg:mx-0">{bio}</p>
+            <div className="flex flex-wrap justify-center lg:justify-start items-center gap-4 mt-2">
               {ctaButtons.map((btn) =>
                 btn.style === 'primary' ? (
                   <a key={btn.label} href={btn.url} className="font-plus-jakarta font-bold text-[15px] text-[#020617] px-7 py-3 rounded-[10px] transition-opacity hover:opacity-90 shadow-[0px_8px_24px_rgba(96,165,250,0.3)]" style={{ background: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' }}>{btn.label}</a>
@@ -170,7 +170,7 @@ export default async function Home() {
                 )
               )}
             </div>
-            <div className="flex items-center gap-4 mt-2">
+            <div className="flex justify-center lg:justify-start items-center gap-4 mt-2">
               {[
                 { href: socials.linkedin, label: 'LinkedIn',    Icon: LinkedInIcon },
                 { href: socials.twitter,  label: 'Twitter / X', Icon: XIcon },
@@ -219,7 +219,7 @@ export default async function Home() {
       </section>
 
       {/* ══ ABOUT ══ */}
-      <section id="about" className="relative bg-[#020617] py-24 px-6">
+      <section id="about" className="relative bg-[#020617] py-16 sm:py-24 px-4 sm:px-6">
         <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[1px]" style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(148,204,255,0.3) 50%, transparent 100%)' }} />
         <div className="max-w-[1280px] mx-auto">
           <div className="mb-16 flex flex-col items-start gap-3">
