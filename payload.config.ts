@@ -1256,8 +1256,6 @@ export default buildConfig({
         },
         forcePathStyle: true,
       },
-      generateFileURL: ({ filename }) =>
-        `${process.env.CLOUDFLARE_R2_PUBLIC_URL || process.env.CLOUDFLARE_R2_ENDPOINT}/${process.env.CLOUDFLARE_R2_BUCKET}/${filename}`,
     }),
   ],
 
