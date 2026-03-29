@@ -39,7 +39,19 @@ export default function ExpertiseTemplate({ heroTitle, heroSubtitle, badge = 'Ex
       </section>
 
       {/* ── CONTENT BLOCKS ── */}
-      <ContentBlocks blocks={contentBlocks} />
+      {contentBlocks && contentBlocks.length > 0 ? (
+        <ContentBlocks blocks={contentBlocks} />
+      ) : (
+        <section className="px-6 pb-24">
+          <div className="max-w-[1280px] mx-auto">
+            <div className="backdrop-blur-[16px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-[24px] p-12 text-center">
+              <p className="font-inter text-[#64748b] text-[15px]">
+                No content added yet. Add blocks in the CMS to build this page.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
     </main>
   )
