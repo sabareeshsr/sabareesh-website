@@ -2,6 +2,7 @@ import path from 'path'
 import { buildConfig, type Block } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { s3Storage } from '@payloadcms/storage-s3'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
@@ -1238,6 +1239,26 @@ export default buildConfig({
         ]},
       ],
     },
+  ],
+
+  plugins: [
+    s3Storage({
+      collections: {
+        media: true,
+      },
+      bucket: process.env.CLOUDFLARE_R2_BUCKET || '',
+      config: {
+        endpoint: process.env.CLOUDFLARE_R2_ENDPOINT,
+        region: 'auto',
+        credentials: {
+          accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY || '',
+        },
+        forcePathStyle: true,
+      },
+      generateFileURL: ({ filename }) =>
+        `${process.env.CLOUDFLARE_R2_PUBLIC_URL || process.env.CLOUDFLARE_R2_ENDPOINT}/${process.env.CLOUDFLARE_R2_BUCKET}/${filename}`,
+    }),
   ],
 
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',

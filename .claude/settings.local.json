@@ -17,7 +17,9 @@
       "WebFetch(domain:medium.com)",
       "WebFetch(domain:payloadcms.com)",
       "WebFetch(domain:www.npmjs.com)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(NODE_OPTIONS=\"--import tsx\" npx payload generate:importmap)"
     ]
   }
 }
+
