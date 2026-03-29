@@ -41,3 +41,26 @@
 .mesh-pulse {
   animation: meshPulse 6s ease-in-out infinite;
 }
+
+/* ── Blog / Prose content fixes ── */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 1rem;
+}
+.prose pre {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.prose table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}
+.prose code {
+  word-break: break-word;
+}
+/* Prevent any element from causing horizontal scroll */
+.prose * {
+  max-width: 100%;
+}

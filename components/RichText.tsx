@@ -1,4 +1,5 @@
 import React from 'react'
+import { getImageUrl } from '@/lib/getImageUrl'
 
 /* ─────────────────────────────────────────────
    Minimal Lexical JSON → React renderer.
@@ -126,6 +127,28 @@ function renderNode(node: LexicalNode, key: number): React.ReactNode {
 
     case 'horizontalrule':
       return <hr key={key} className="border-[rgba(255,255,255,0.1)] my-8" />
+
+    case 'upload': {
+      // node.value is the populated Payload media document
+      const media = (node as any).value
+      const url = getImageUrl(media)
+      if (!url) return null
+      const caption = media?.caption
+      return (
+        <figure key={key} className="my-8">
+          <img
+            src={url}
+            alt={media?.alt || media?.filename || 'image'}
+            className="w-full max-w-full h-auto rounded-2xl border border-white/10 object-cover"
+          />
+          {caption && (
+            <figcaption className="text-center text-white/40 text-sm mt-2 font-inter">
+              {caption}
+            </figcaption>
+          )}
+        </figure>
+      )
+    }
 
     default:
       // unknown node — recurse into children if present

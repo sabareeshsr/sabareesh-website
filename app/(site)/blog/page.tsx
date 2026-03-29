@@ -61,7 +61,7 @@ export default async function BlogPage() {
     <main className="bg-[#020617] min-h-screen">
 
       {/* ── HERO ── */}
-      <section className="relative pt-28 pb-16 px-6 overflow-hidden">
+      <section className="relative pt-24 sm:pt-28 pb-12 sm:pb-16 px-4 sm:px-6 overflow-hidden">
         <div className="pointer-events-none absolute inset-0" style={{
           background: [
             'radial-gradient(ellipse 50% 60% at 20% 50%, rgba(37,99,235,0.1) 0%, transparent 70%)',
@@ -73,7 +73,7 @@ export default async function BlogPage() {
             <span className="font-inter font-semibold text-[12px] text-[#94ccff] tracking-[1.2px] uppercase bg-[rgba(148,204,255,0.1)] px-3 py-1 rounded-full inline-block mb-5">
               Writing
             </span>
-            <h1 className="font-plus-jakarta font-extrabold text-[56px] md:text-[72px] tracking-tight leading-none mb-5">
+            <h1 className="font-plus-jakarta font-extrabold text-[36px] sm:text-[48px] md:text-[60px] lg:text-[72px] tracking-tight leading-none mb-5">
               <span className="bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' }}>
                 {heroTitle}
               </span>
@@ -91,7 +91,7 @@ export default async function BlogPage() {
       </section>
 
       {/* ── BLOG LIST (client: search + filter) ── */}
-      <section className="px-6 pb-24">
+      <section className="px-4 sm:px-6 pb-16 sm:pb-24">
         <div className="max-w-[1280px] mx-auto">
           <BlogClient posts={posts} />
         </div>
