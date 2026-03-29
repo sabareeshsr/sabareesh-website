@@ -1,4 +1,6 @@
 import RichText from '@/components/RichText'
+import CMSImage from '@/components/CMSImage'
+import { getImageUrl } from '@/lib/getImageUrl'
 
 export interface ExperienceBlockData {
   blockType: 'experience'
@@ -14,13 +16,6 @@ export interface ExperienceBlockData {
 }
 
 const GLASS = 'backdrop-blur-[16px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-[24px]'
-
-function resolveUrl(img: { url?: string; filename?: string } | null | undefined): string | null {
-  if (!img) return null
-  if (img.url) return img.url
-  if (img.filename) return `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/api/media/file/${img.filename}`
-  return null
-}
 
 export default function ExperienceSection({ data }: { data: ExperienceBlockData }) {
   if (!data.experiences?.length) return null
@@ -47,12 +42,12 @@ export default function ExperienceSection({ data }: { data: ExperienceBlockData 
 
         <div className="flex flex-col gap-6">
           {data.experiences.map((exp, i) => {
-            const logoUrl = resolveUrl(exp.logo)
+            const logoUrl = getImageUrl(exp.logo)
             return (
               <div key={i} className={`${GLASS} p-7 flex gap-6 items-start`}>
                 {logoUrl && (
                   <div className="shrink-0 w-14 h-14 rounded-[12px] overflow-hidden bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] flex items-center justify-center">
-                    <img src={logoUrl} alt={exp.company} width={56} height={56} className="object-contain" />
+                    <CMSImage image={exp.logo} alt={exp.company} width={56} height={56} className="object-contain" />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">

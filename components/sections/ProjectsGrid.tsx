@@ -11,14 +11,10 @@ export interface ProjectsGridBlockData {
   }>
 }
 
-const GLASS = 'backdrop-blur-[16px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-[24px]'
+import CMSImage from '@/components/CMSImage'
+import { getImageUrl } from '@/lib/getImageUrl'
 
-function resolveUrl(img: { url?: string; filename?: string } | null | undefined): string | null {
-  if (!img) return null
-  if (img.url) return img.url
-  if (img.filename) return `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/api/media/file/${img.filename}`
-  return null
-}
+const GLASS = 'backdrop-blur-[16px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-[24px]'
 
 export default function ProjectsGrid({ data }: { data: ProjectsGridBlockData }) {
   if (!data.projects?.length) return null
@@ -45,12 +41,12 @@ export default function ProjectsGrid({ data }: { data: ProjectsGridBlockData }) 
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {data.projects.map((project, i) => {
-            const imgUrl = resolveUrl(project.image)
+            const imgUrl = getImageUrl(project.image)
             return (
               <div key={i} className={`${GLASS} flex flex-col overflow-hidden hover:border-[rgba(96,165,250,0.3)] transition-colors duration-200`}>
                 {imgUrl && (
                   <div className="relative h-[180px] w-full bg-[rgba(255,255,255,0.03)]">
-                    <img src={imgUrl} alt={project.title} className="w-full h-full object-cover" />
+                    <CMSImage image={project.image} alt={project.title} className="w-full h-full object-cover" />
                   </div>
                 )}
                 <div className="p-6 flex flex-col gap-3 flex-1">

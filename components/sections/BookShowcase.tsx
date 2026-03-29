@@ -1,4 +1,6 @@
 import RichText from '@/components/RichText'
+import CMSImage from '@/components/CMSImage'
+import { getImageUrl } from '@/lib/getImageUrl'
 
 export interface BookShowcaseBlockData {
   blockType: 'book-showcase'
@@ -23,16 +25,9 @@ const LINK_ICON = (
   </svg>
 )
 
-function resolveUrl(img: { url?: string; filename?: string } | null | undefined): string | null {
-  if (!img) return null
-  if (img.url) return img.url
-  if (img.filename) return `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/api/media/file/${img.filename}`
-  return null
-}
-
 export default function BookShowcase({ data }: { data: BookShowcaseBlockData }) {
   const title = data.bookTitle || 'Untitled Book'
-  const coverUrl = resolveUrl(data.bookCover)
+  const coverUrl = getImageUrl(data.bookCover)
 
   return (
     <section className="px-6 pb-8">
@@ -47,7 +42,7 @@ export default function BookShowcase({ data }: { data: BookShowcaseBlockData }) 
                 style={{ background: 'linear-gradient(160deg, rgba(96,165,250,0.15) 0%, rgba(37,99,235,0.08) 100%)' }}
               >
                 {coverUrl ? (
-                  <img src={coverUrl} alt={`${title} cover`} className="w-full h-full object-cover" />
+                  <CMSImage image={data.bookCover} alt={`${title} cover`} className="w-full h-full object-cover" />
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 border border-[rgba(96,165,250,0.2)] rounded-[16px]">
                     <span className="text-5xl">📖</span>

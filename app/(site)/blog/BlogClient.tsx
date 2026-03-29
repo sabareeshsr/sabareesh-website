@@ -1,6 +1,7 @@
 'use client'
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
+import { getImageUrl } from '@/lib/getImageUrl'
 
 interface Post {
   id: string
@@ -13,14 +14,6 @@ interface Post {
   readTime?: number
 }
 
-const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
-
-function mediaUrl(img: { url?: string; filename?: string } | undefined): string | null {
-  if (!img) return null
-  if (img.url) return img.url
-  if (img.filename) return `${SERVER_URL}/api/media/file/${img.filename}`
-  return null
-}
 
 function estimateReadTime(excerpt: string | undefined): number {
   const words = (excerpt ?? '').split(/\s+/).filter(Boolean).length
@@ -137,13 +130,13 @@ export default function BlogClient({ posts }: { posts: Post[] }) {
             const date = formatDate(post.publishedDate)
             const tag  = post.tags?.[0]?.tag
 
-            const imgUrl = mediaUrl(post.featuredImage)
+            const imgUrl = getImageUrl(post.featuredImage)
             return (
               <Link key={post.id} href={`/blog/${slug}`} className={`${GLASS} flex flex-col group hover:border-[rgba(96,165,250,0.35)] hover:bg-[rgba(96,165,250,0.03)] transition-all duration-200`}>
                 {/* Featured image */}
                 <div className="relative h-[200px] overflow-hidden rounded-t-[24px] bg-[rgba(96,165,250,0.06)]">
                   {imgUrl ? (
-                    <img src={imgUrl} alt={post.featuredImage?.alt ?? post.title} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
+                    <img src={imgUrl} alt={post.featuredImage?.alt ?? post.title} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                   ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
                       <span className="text-4xl opacity-40">📝</span>

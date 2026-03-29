@@ -26,7 +26,7 @@ async function getPosts(): Promise<Post[]> {
       collection: 'blog-posts',
       where: { status: { equals: 'published' } },
       sort: '-publishedDate',
-      depth: 1,
+      depth: 2,
       limit: 100,
     })
     return docs as Post[]

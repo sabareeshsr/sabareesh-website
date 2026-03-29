@@ -11,14 +11,10 @@ export interface CertificationsBlockData {
   }>
 }
 
-const GLASS = 'backdrop-blur-[16px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-[24px]'
+import CMSImage from '@/components/CMSImage'
+import { getImageUrl } from '@/lib/getImageUrl'
 
-function resolveUrl(img: { url?: string; filename?: string } | null | undefined): string | null {
-  if (!img) return null
-  if (img.url) return img.url
-  if (img.filename) return `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/api/media/file/${img.filename}`
-  return null
-}
+const GLASS = 'backdrop-blur-[16px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-[24px]'
 
 export default function Certifications({ data }: { data: CertificationsBlockData }) {
   if (!data.certifications?.length) return null
@@ -45,12 +41,12 @@ export default function Certifications({ data }: { data: CertificationsBlockData
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {data.certifications.map((cert, i) => {
-            const badgeUrl = resolveUrl(cert.badgeImage)
+            const badgeUrl = getImageUrl(cert.badgeImage)
             const inner = (
               <div key={i} className={`${GLASS} p-6 flex gap-4 items-start hover:border-[rgba(96,165,250,0.3)] transition-colors duration-200`}>
                 {badgeUrl && (
                   <div className="shrink-0 w-12 h-12 rounded-[10px] overflow-hidden bg-white/5">
-                    <img src={badgeUrl} alt={cert.title} width={48} height={48} className="object-contain" />
+                    <CMSImage image={cert.badgeImage} alt={cert.title} width={48} height={48} className="object-contain" />
                   </div>
                 )}
                 <div className="min-w-0">

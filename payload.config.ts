@@ -1244,7 +1244,11 @@ export default buildConfig({
   plugins: [
     s3Storage({
       collections: {
-        media: true,
+        media: {
+          disableLocalStorage: true,
+          generateFileURL: ({ filename }) =>
+            `${process.env.CLOUDFLARE_R2_PUBLIC_URL}/${filename}`,
+        },
       },
       bucket: process.env.CLOUDFLARE_R2_BUCKET || '',
       config: {

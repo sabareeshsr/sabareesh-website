@@ -21,7 +21,7 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
   try {
     const payload = await getPayload({ config: configPromise })
     const data = await Promise.race([
-      payload.findGlobal({ slug: 'site-settings', depth: 1 }),
+      payload.findGlobal({ slug: 'site-settings', depth: 2 }),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
     ])
     return data as SiteSettings

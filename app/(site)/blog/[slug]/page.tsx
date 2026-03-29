@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import RichText from '@/components/RichText'
+import { getImageUrl } from '@/lib/getImageUrl'
 
 interface Post {
   id: string; title: string; slug?: string; excerpt?: string
@@ -14,12 +15,6 @@ interface Post {
   content?: object
 }
 
-function mediaUrl(img: { url?: string; filename?: string } | undefined): string | null {
-  if (!img) return null
-  if (img.url) return img.url
-  if (img.filename) return `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/api/media/file/${img.filename}`
-  return null
-}
 
 async function getPost(slug: string): Promise<Post | null> {
   try {
@@ -45,7 +40,7 @@ async function getRelatedPosts(currentId: string, tags: string[]): Promise<Post[
           { id: { not_equals: currentId } },
         ],
       },
-      limit: 3, depth: 1,
+      limit: 3, depth: 2,
     })
     return docs as Post[]
   } catch { return [] }
@@ -68,7 +63,7 @@ export async function generateMetadata(
     openGraph: {
       title: post.title,
       description: post.excerpt ?? '',
-      images: mediaUrl(post.featuredImage) ? [{ url: mediaUrl(post.featuredImage)! }] : [],
+      images: getImageUrl(post.featuredImage) ? [{ url: getImageUrl(post.featuredImage) }] : [],
     },
   }
 }
@@ -136,12 +131,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       </section>
 
       {/* ── FEATURED IMAGE ── */}
-      {mediaUrl(post.featuredImage) && (
+      {getImageUrl(post.featuredImage) && (
         <section className="px-6 pb-12">
           <div className="max-w-[860px] mx-auto">
             <div className="relative h-[300px] md:h-[460px] rounded-[24px] overflow-hidden">
               <img
-                src={mediaUrl(post.featuredImage)!}
+                src={getImageUrl(post.featuredImage)}
                 alt={post.featuredImage?.alt ?? post.title}
                 className="w-full h-full object-cover"
               />

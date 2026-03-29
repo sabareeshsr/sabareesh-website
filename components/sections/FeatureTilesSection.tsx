@@ -1,5 +1,7 @@
+import CMSImage from '@/components/CMSImage'
+
 export interface FeatureTile {
-  icon?: { url?: string } | null
+  icon?: { url?: string; filename?: string } | null
   iconEmoji?: string
   title: string
   description?: string
@@ -51,14 +53,8 @@ export default function FeatureTilesSection({ sectionLabel, sectionHeading, tile
               className="backdrop-blur-[16px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.12)] rounded-[24px] p-7 hover:border-[rgba(96,165,250,0.3)] transition-colors duration-200"
             >
               <div className="mb-5">
-                {tile.icon?.url ? (
-                  <img
-                    src={tile.icon.url}
-                    alt={tile.title}
-                    width={48}
-                    height={48}
-                    className="object-contain"
-                  />
+                {tile.icon ? (
+                  <CMSImage image={tile.icon} alt={tile.title} width={48} height={48} className="object-contain" />
                 ) : (
                   <span className="text-4xl">{tile.iconEmoji || '✦'}</span>
                 )}
