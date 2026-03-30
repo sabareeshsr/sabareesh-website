@@ -147,7 +147,7 @@ export default async function Home() {
   return (
     <>
       {/* ══ HERO ══ */}
-      <section className="relative min-h-[calc(100vh-65px)] flex items-center overflow-x-hidden bg-[#020617]">
+      <section className="relative min-h-[calc(100vh-65px)] flex items-center overflow-hidden bg-[#020617]">
         <div className="pointer-events-none absolute inset-0 mesh-pulse" style={{ background: ['radial-gradient(ellipse 55% 65% at 78% 50%, rgba(74,159,224,0.18) 0%, transparent 70%)', 'radial-gradient(ellipse 30% 40% at 75% 48%, rgba(96,165,250,0.10) 0%, transparent 55%)', 'radial-gradient(ellipse 20% 25% at 20% 80%, rgba(37,99,235,0.07) 0%, transparent 60%)'].join(', ') }} />
         <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(148,204,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(148,204,255,1) 1px, transparent 1px)', backgroundSize: '80px 80px' }} />
 
